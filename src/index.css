@@ -186,6 +186,7 @@ h4 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
   position: fixed; bottom: 0; left: 0; width: 100%; height: var(--player-height);
   background: var(--color-surface-container-lowest); border-top: 1px solid var(--color-surface-container);
   display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 300;
+  box-sizing: border-box;
 }
 .player-thumb { width: 56px; height: 56px; border-radius: 8px; overflow: hidden; }
 .player-thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -300,9 +301,18 @@ h4 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
   .table-header { display: none; }
   .table-row { grid-template-columns: 1fr; gap: 8px; text-align: left; }
   
-  .fsp-layout { grid-template-columns: 1fr; height: auto; overflow-y: auto; }
-  .huge-lyrics { font-size: 28px; }
-  
+  .fullscreen-player-desktop { overflow-y: auto; }
+  .fsp-header { padding: 16px 24px; }
+  .fsp-header .logo { font-size: 20px !important; }
+  .fsp-layout { grid-template-columns: 1fr; height: auto; padding: 0 24px 48px 24px; gap: 48px; }
+  .fsp-left { align-items: center; text-align: center; }
+  .fsp-cover { max-width: 280px; margin: 0 auto 24px auto; }
+  .fsp-left h1 { font-size: 32px !important; }
+  .fsp-left p { font-size: 20px !important; }
+  .fsp-left .mt-xl { margin-top: 24px !important; margin-bottom: 24px !important; width: 100%; }
+  .fsp-left > div:last-child { flex-direction: column-reverse; gap: 24px; }
+  .huge-lyrics { font-size: 24px; text-align: center; }
+  .fsp-tabs { justify-content: center; }  
   .global-player { padding: 0 16px; }
   .player-right, .player-center .icon-btn:not(.play-fab), .player-center .scrubber-bar { display: none; }
   .player-center { flex: 0; }

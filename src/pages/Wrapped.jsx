@@ -84,10 +84,10 @@ const Wrapped = () => {
 
       <div className="grid-5col mb-xl">
         {[
-          { title: 'Eternal Grace', artist: 'Sacred Light Ensemble', img: 'https://images.unsplash.com/photo-1470229722913-7c090be31d04?auto=format&fit=crop&q=80&w=400' },
+          { title: 'Eternal Grace', artist: 'Sacred Light Ensemble', img: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=400' },
           { title: 'Dawn of Mercy', artist: 'Zion Collective', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=400' },
           { title: 'Mountain Prayer', artist: 'Covenant Echoes', img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=400' },
-          { title: 'River of Life', artist: 'The Wellspring', img: 'https://images.unsplash.com/photo-1548625361-ec8538260682?auto=format&fit=crop&q=80&w=400' },
+          { title: 'River of Life', artist: 'The Wellspring', img: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&q=80&w=400' },
           { title: 'Shadowlands', artist: 'Pilgrim\'s Path', img: 'https://images.unsplash.com/photo-1436891620584-47fd0e565afb?auto=format&fit=crop&q=80&w=400' }
         ].map(anthem => (
           <div key={anthem.title} className="album-card">

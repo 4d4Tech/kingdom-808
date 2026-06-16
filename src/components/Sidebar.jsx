@@ -18,8 +18,8 @@ const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen }) => {
       
       <nav className="sidebar-nav">
         <button className={`sidebar-item ${currentView === 'artist' ? 'active' : ''}`} onClick={() => setCurrentView('artist')}>
-          <span className={`material-symbols-outlined ${currentView === 'artist' ? 'fill-icon' : ''}`}>home</span>
-          Home
+          <span className={`material-symbols-outlined ${currentView === 'artist' ? 'fill-icon' : ''}`}>person</span>
+          Artist Profile
         </button>
         <button className={`sidebar-item ${currentView === 'discover' ? 'active' : ''}`} onClick={() => setCurrentView('discover')}>
           <span className={`material-symbols-outlined ${currentView === 'discover' ? 'fill-icon' : ''}`}>explore</span>
@@ -34,8 +34,8 @@ const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen }) => {
           Live
         </button>
         <button className={`sidebar-item ${currentView === 'player' ? 'active' : ''}`} onClick={() => setCurrentView('player')}>
-          <span className={`material-symbols-outlined ${currentView === 'player' ? 'fill-icon' : ''}`}>person</span>
-          Profile
+          <span className={`material-symbols-outlined ${currentView === 'player' ? 'fill-icon' : ''}`}>play_circle</span>
+          Immersive Player
         </button>
       </nav>
 

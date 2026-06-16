@@ -110,7 +110,7 @@ exports.incrementPlayCount = onCall(async (request) => {
 /**
  * Phase 3: Billboard Charts Aggregation
  */
-exports.aggregateBillboardCharts = onSchedule("every sunday 00:00", async (event) => {
+exports.aggregateBillboardCharts = onSchedule("every sunday 00:00", async () => {
   const tracksSnap = await db.collection("tracks").get();
   const genreCharts = {};
 

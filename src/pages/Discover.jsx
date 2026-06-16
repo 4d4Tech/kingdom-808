@@ -14,7 +14,7 @@ const Discover = () => {
       <div className="desktop-col-layout mb-xl" style={{gap: '32px'}}>
         <div className="left-col">
           <div className="celestial-hero m-0" style={{height: '100%', minHeight: '320px'}}>
-            <img src="https://images.unsplash.com/photo-1470229722913-7c090be31d04?auto=format&fit=crop&q=80&w=1200" alt="Heaven on Earth" />
+            <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=1200" alt="Heaven on Earth" />
             <div className="celestial-overlay" style={{padding: '48px'}}>
               <div>
                 <span className="badge" style={{backgroundColor: '#9a7500', color: 'white', padding: '6px 16px', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px'}}>CHART TOPPER #1</span>
@@ -108,7 +108,7 @@ const Discover = () => {
         <h2 className="mb-4">Explore Genres</h2>
         <div className="genre-cards">
           <div className="genre-card">
-            <img src="https://images.unsplash.com/photo-1548625361-ec8538260682?auto=format&fit=crop&q=80&w=600" alt="Worship" />
+            <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&q=80&w=600" alt="Worship" />
             <div className="overlay"></div>
             <div className="content">
               <h3>Worship</h3>
@@ -126,7 +126,7 @@ const Discover = () => {
             </div>
           </div>
           <div className="genre-card">
-            <img src="https://images.unsplash.com/photo-1490750967868-88cb44cb2722?auto=format&fit=crop&q=80&w=600" alt="CHH" />
+            <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600" alt="CHH" />
             <div className="overlay"></div>
             <div className="content">
               <h3>CHH</h3>

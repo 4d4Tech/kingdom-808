@@ -20,7 +20,7 @@ function App() {
       case 'playlist': return <PlaylistDetail />;
       case 'discover': return <Discover />;
       case 'wrapped': return <Wrapped />;
-      case 'player': return <FullScreenPlayer />;
+      case 'player': return <FullScreenPlayer setCurrentView={setCurrentView} />;
       default: return <ArtistProfile />;
     }
   };

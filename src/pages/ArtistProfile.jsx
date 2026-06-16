@@ -54,7 +54,7 @@ const ArtistProfile = () => {
             {[
               { num: '01', title: 'Abiding Light', plays: '42,506,120 plays', time: '4:12', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=100' },
               { num: '02', title: 'Streams in the Desert', plays: '38,192,440 plays', time: '5:45', img: 'https://images.unsplash.com/photo-1472712739516-7ad2b786e1f7?auto=format&fit=crop&q=80&w=100' },
-              { num: '03', title: 'Still Waters (Live from Nashville)', plays: '12,440,011 plays', time: '6:30', img: 'https://images.unsplash.com/photo-1490750967868-88cb44cb2722?auto=format&fit=crop&q=80&w=100' }
+              { num: '03', title: 'Still Waters (Live from Nashville)', plays: '12,440,011 plays', time: '6:30', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=100' }
             ].map(track => (
               <div key={track.num} className="track-row">
                 <span className="track-num text-sm">{track.num}</span>

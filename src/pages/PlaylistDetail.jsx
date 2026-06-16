@@ -52,7 +52,7 @@ const PlaylistDetail = () => {
           {[
             { num: '01', title: 'Oceans (Where Feet May Fail)', artist: 'Hillsong UNITED', album: 'Zion', date: 'Oct 12, 2023', time: '8:55', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=100' },
             { num: '02', title: 'Gratitude', artist: 'Brandon Lake', album: 'House of Miracles', date: 'Oct 14, 2023', time: '5:38', img: 'https://images.unsplash.com/photo-1472712739516-7ad2b786e1f7?auto=format&fit=crop&q=80&w=100' },
-            { num: '03', title: 'Way Maker', artist: 'Sinach', album: 'Way Maker', date: 'Oct 15, 2023', time: '5:04', img: 'https://images.unsplash.com/photo-1490750967868-88cb44cb2722?auto=format&fit=crop&q=80&w=100' },
+            { num: '03', title: 'Way Maker', artist: 'Sinach', album: 'Way Maker', date: 'Oct 15, 2023', time: '5:04', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=100' },
             { num: '04', title: 'Goodness of God', artist: 'CeCe Winans', album: 'Believe For It', date: 'Oct 20, 2023', time: '4:58', img: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&q=80&w=100' }
           ].map(track => (
             <div key={track.num} className="table-row">
@@ -80,7 +80,7 @@ const PlaylistDetail = () => {
         
         <div className="grid-5col">
           {[
-            { title: 'Sunday Serenity', info: 'Peaceful instrumental ...', img: 'https://images.unsplash.com/photo-1548625361-ec8538260682?auto=format&fit=crop&q=80&w=400' },
+            { title: 'Sunday Serenity', info: 'Peaceful instrumental ...', img: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&q=80&w=400' },
             { title: 'Modern Hymns', info: 'Classic lyrics, new sou...', img: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=400' },
             { title: 'Praise & Power', info: 'Uplifting contemporary ...', img: 'https://images.unsplash.com/photo-1526478806334-5fd488fcaabc?auto=format&fit=crop&q=80&w=400' },
             { title: 'Quiet Reflection', info: 'Acoustic moments of p...', img: 'https://images.unsplash.com/photo-1436891620584-47fd0e565afb?auto=format&fit=crop&q=80&w=400' },
