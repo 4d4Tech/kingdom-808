@@ -1,0 +1,427 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Selah Grace | TrinitySound</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e2e2e2",
+                    "on-surface": "#1a1c1c",
+                    "surface-bright": "#f9f9f9",
+                    "tertiary": "#515a5f",
+                    "surface-container-highest": "#e2e2e2",
+                    "tertiary-fixed-dim": "#bfc8ce",
+                    "surface-container-high": "#e8e8e8",
+                    "inverse-primary": "#94ccff",
+                    "on-secondary-fixed": "#241a00",
+                    "secondary-fixed-dim": "#e9c349",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#2f3131",
+                    "on-primary-container": "#f3f7ff",
+                    "on-primary": "#ffffff",
+                    "background": "#f9f9f9",
+                    "outline-variant": "#bfc7d1",
+                    "on-secondary-fixed-variant": "#574500",
+                    "primary-container": "#0077b6",
+                    "surface": "#f9f9f9",
+                    "on-tertiary-fixed": "#151d22",
+                    "primary-fixed": "#cde5ff",
+                    "on-surface-variant": "#404850",
+                    "surface-tint": "#006399",
+                    "inverse-on-surface": "#f0f1f1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#745c00",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#dadada",
+                    "on-tertiary-container": "#f0f8ff",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#94ccff",
+                    "on-background": "#1a1c1c",
+                    "tertiary-container": "#6a7278",
+                    "tertiary-fixed": "#dbe4ea",
+                    "secondary-fixed": "#ffe088",
+                    "secondary-container": "#fed65b",
+                    "surface-container-low": "#f3f3f4",
+                    "on-primary-fixed-variant": "#004b74",
+                    "outline": "#707881",
+                    "on-tertiary-fixed-variant": "#40484d",
+                    "surface-container": "#eeeeee",
+                    "secondary": "#735c00",
+                    "error-container": "#ffdad6",
+                    "primary": "#005d90",
+                    "on-primary-fixed": "#001d32"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "lg": "48px",
+                    "margin-desktop": "64px",
+                    "xs": "4px",
+                    "xl": "80px",
+                    "sm": "12px",
+                    "max-width": "1440px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "label-sm": ["Geist"],
+                    "body-lg": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "body-md": ["Geist"],
+                    "headline-sm": ["Playfair Display"],
+                    "label-md": ["Geist"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .waveform-bar {
+            width: 3px;
+            border-radius: 2px;
+            background: linear-gradient(to top, #0077B6, transparent);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #bfc7d1;
+            border-radius: 10px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md selection:bg-primary-fixed-dim selection:text-on-primary-fixed">
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl shadow-[0px_10px_30px_rgba(0,119,182,0.08)] flex justify-between items-center px-margin-mobile md:px-margin-desktop h-16 transition-all duration-300 ease-in-out">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-primary-fixed">
+<img alt="Profile" class="w-full h-full object-cover" data-alt="A serene close-up portrait of a female worship leader in a bright, ethereal music studio. She has a peaceful expression, illuminated by soft, natural morning light coming through a window. The aesthetic is clean, minimalist, and light-themed, featuring soft sky blue and gold undertones in the surrounding environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD2mZp7OpQi96cvNH-6XP8Ix2ZALUg74O4YIoP4rWqLf_yoyKyJaHiHZ3G6szzHJFKMcXvkh9VqSRXl9rFRQXvobhFuqgqunpkG7YcL5V7AfCCHD3GmxVMpWc0ZQmMNGzqT-hTqenhTtlVGnHQu7VIyg6Kh1jqat8ovlcoQaq9HVOgGnKQ1SY-AF6jDTjODYBGsZZXIvs4z_2lfNpUaq7jaD6dm4lRucnLWUsIWe_BlUoDEyKHaESLqeWO2qwdnFMsLzHj9dfQ0TfMO">
+</div>
+<span class="font-headline-sm text-headline-sm text-primary italic">TRINITY<i class="italic">Sound</i></span>
+</div>
+<div class="hidden md:flex gap-gutter items-center">
+<button class="text-primary font-bold hover:opacity-80 transition-opacity">Home</button>
+<button class="text-outline hover:opacity-80 transition-opacity">Library</button>
+<button class="text-outline hover:opacity-80 transition-opacity">Search</button>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer hover:opacity-80 transition-opacity" data-icon="search">search</span>
+</div>
+</header>
+<main class="max-w-max-width mx-auto pt-16 pb-32">
+<!-- Hero Section -->
+<section class="relative h-[450px] md:h-[600px] overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Cover" class="w-full h-full object-cover" data-alt="A high-end cinematic wide shot of a worship artist performing on a stage filled with soft volumetric light and atmospheric haze. The lighting is dominated by transcendently bright whites and ethereal sky blue glows, creating a sacred and modern concert atmosphere. The background is minimalist and expansive, evoking a sense of spiritual peace and grandeur." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFnX6vxz35kTYcTfc9YUx3Nae5DqBg_tAtd602jlfzF3vW74OwtGfs_lqei6-aqO7DfzKaWK9SAVpXJ9imVchJAIrtjdjlokVY9RIroHZcvXr7BIT0dJpYlsCDJWQINKWR7DVwOoJAfcZ1vftRchPWX5oBPDAfHfn3ibyx-ARNZvWwth5jmTtAOI5buHBKPPFtfkBdzLZ0AJUKOUBP684XbC71sCtII3mbGvtVe_gHrbM6IDjAadeyKyCWiqEjKZP3rw3n9oIDFd9Z">
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent"></div>
+</div>
+<div class="relative z-10 h-full flex flex-col justify-end px-margin-mobile md:px-margin-desktop pb-xl">
+<div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+<div>
+<p class="font-label-md text-label-md text-primary-container tracking-widest uppercase mb-2">Featured Artist</p>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-4">Selah Grace</h1>
+<div class="flex gap-gutter text-on-surface-variant mb-6">
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary">2.4M</span>
+<span class="font-label-sm text-label-sm uppercase">Monthly Listeners</span>
+</div>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-primary">840K</span>
+<span class="font-label-sm text-label-sm uppercase">Followers</span>
+</div>
+</div>
+</div>
+<div class="flex gap-4 mb-2">
+<button class="bg-secondary-container text-on-secondary-container px-8 h-12 rounded-full font-bold shadow-lg hover:scale-105 transition-transform flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="person_add">person_add</span>
+                            Follow
+                        </button>
+<button class="bg-primary-container text-on-primary-container px-8 h-12 rounded-full font-bold shadow-lg hover:scale-105 transition-transform flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="play_arrow" data-weight="fill">play_arrow</span>
+                            Play Radio
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Content Grid -->
+<div class="px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-12 gap-xl">
+<!-- Left Column: Top Tracks & Discography -->
+<div class="lg:col-span-8 space-y-xl">
+<!-- Top Tracks -->
+<section>
+<div class="flex items-center justify-between mb-gutter">
+<h2 class="font-headline-md text-headline-md">Top Tracks</h2>
+<button class="text-primary font-label-md text-label-md hover:underline">View All</button>
+</div>
+<div class="space-y-base">
+<!-- Track Item 1 -->
+<div class="group flex items-center p-4 rounded-xl hover:bg-surface-container-low transition-all cursor-pointer">
+<span class="w-8 text-outline font-label-md">01</span>
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container mr-4">
+<img alt="Track" class="w-full h-full object-cover" data-alt="Album art featuring a minimalist geometric cross in gold against a soft sky blue and white background. The style is transcendental and modern, with high-key lighting and a sense of divine peace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_zJIpzDSsqzu4MoORRz8T7jhSWovR8d4sNtz6WEfx45GwrUSaoQENzVAcgexRPm_TEXEutjc1HgCE7f9rL11fItW3kOrap9P68wbjhgBcklVcayDbBUO2_0G7ujNja0NA8j8DSxsTF-sg51P-5OV4EaykiJQycFMuWrTm803_EVybo1qfVuzv0xbbstggjQT_puQH98tAic078L8G-h_jW-9DxAuUhe6UrIjyvy8e46VKhz1WP165ovnJ-Mb3BRaSAYkX2-ObKXMb">
+</div>
+<div class="flex-1">
+<h3 class="font-body-lg text-body-lg text-on-surface group-hover:text-primary transition-colors">Echoes of Eternity</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Divine Radiance (Live)</p>
+</div>
+<div class="hidden md:block text-outline text-label-md mr-gutter">15,402,120 plays</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary" data-icon="more_vert">more_vert</span>
+</div>
+<!-- Track Item 2 -->
+<div class="group flex items-center p-4 rounded-xl hover:bg-surface-container-low transition-all cursor-pointer">
+<span class="w-8 text-outline font-label-md">02</span>
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container mr-4">
+<img alt="Track" class="w-full h-full object-cover" data-alt="Music album artwork showcasing a golden sunrise over a peaceful ocean, with soft blue and white hues. The mood is spiritual and uplifting, reflecting a contemporary Christian music aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP1NOZ4sCsE0ff3YqXLf0NP6CCnsiGpkWkp8r9Es1vmhyDbd3XGwBTzPvgnmh3HDA3WjIfkRvB4vn14kEr_ZFpygQos1tEU9Kng3aM95epkxs2EBJTZ0f1bI7C5ovCYJvYA6v-VBzrYrJOZKaVyAVfp4MwHn7FUL2ovsPoQj_kQQj3MuCBzj5H0JxUi5MxRkkf9C1noN_IpKPq6GFy5i0AgQHOvbXDxhxq1kIETbv5X3ihY2y1BpTFQ2nCAuJkFWEEq25MNliS7cLk">
+</div>
+<div class="flex-1">
+<h3 class="font-body-lg text-body-lg text-on-surface group-hover:text-primary transition-colors">Morning Grace</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Selah Grace</p>
+</div>
+<div class="hidden md:block text-outline text-label-md mr-gutter">9,120,405 plays</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary" data-icon="more_vert">more_vert</span>
+</div>
+<!-- Track Item 3 -->
+<div class="group flex items-center p-4 rounded-xl hover:bg-surface-container-low transition-all cursor-pointer">
+<span class="w-8 text-outline font-label-md">03</span>
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-surface-container mr-4">
+<img alt="Track" class="w-full h-full object-cover" data-alt="Minimalist abstract art representing a descent of light. Vertical golden streaks on a white and pale blue canvas. Clean, modern, and spiritually evocative." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDci9DMrE9uraar0Fb09EnH8nUhhUHdfKVx2KTCZELyMOx4koASqH1PjaD-8oXj2AGPQw9Y9-X4wIYHvMrixJvbnee2WCEjXu-rqGll2xY6Nyk0mk2svIPworFUo9QtwJvyMVOdS6SqhzTKGb7SeSLnAkbgSgrs_09q85KTIsX0_O6VY3CbIUhGm-0fxddKQKKZw8wrirm9Zg7yfe7ZDNzt7mkWFVTSlmn06GkyDhwN4jo8gH6wHJW8Tu7fjDPFf1K1es6LMYmsFnPa">
+</div>
+<div class="flex-1">
+<h3 class="font-body-lg text-body-lg text-on-surface group-hover:text-primary transition-colors">Found in the Silence</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Silent Praises</p>
+</div>
+<div class="hidden md:block text-outline text-label-md mr-gutter">7,540,200 plays</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary" data-icon="more_vert">more_vert</span>
+</div>
+</div>
+</section>
+<!-- Discography Bento -->
+<section>
+<div class="flex items-center justify-between mb-gutter">
+<h2 class="font-headline-md text-headline-md">Discography</h2>
+<div class="flex gap-2">
+<span class="px-4 py-1 rounded-full bg-surface-container text-on-surface-variant text-label-md cursor-pointer hover:bg-primary-fixed transition-colors">Albums</span>
+<span class="px-4 py-1 rounded-full bg-primary-container text-on-primary-container text-label-md cursor-pointer">Singles</span>
+</div>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<!-- Album Card 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden mb-4 shadow-[0px_10px_30px_rgba(0,119,182,0.05)] border border-primary-fixed/20 group-hover:scale-[1.02] transition-transform duration-300">
+<img alt="Album" class="w-full h-full object-cover" data-alt="A premium album cover design featuring soft focus white lilies and ethereal light beams. The overall aesthetic is divine, minimalist, and uses a sky blue and gold color palette to signify spiritual purity and excellence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3mK5iNV-bxLxvM-JEmHpGIqzPdX5ukuMREkdZkvOlFUKWdEpEBT0QorM4awYybDO6iMRlK3FWV8DwUwvSUlQzHu5KKBd-_iSq0s8u-JICZJS-7dYBkfAUvhV9-lBDxTA4gf-E3Sfb6Rlj-VwOkANDMS2WJULD3oA-jZRVqWR9Lle2TW16gj8GvKVYIl5x-J8vLJ0Gp4j0oQJtCt3jTHUcwoyXJ6FzGG17mIg3zc1BFdG8n0DOpXn3kqOxVHrSYEb_PVz_Y8vwN3xL">
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1 truncate">Divine Radiance</h4>
+<p class="font-label-sm text-label-sm text-outline">2024 • Album</p>
+</div>
+<!-- Album Card 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden mb-4 shadow-[0px_10px_30px_rgba(0,119,182,0.05)] border border-primary-fixed/20 group-hover:scale-[1.02] transition-transform duration-300">
+<img alt="Album" class="w-full h-full object-cover" data-alt="Elegant Christian music album cover with a gold embossed script on a pristine white background. The atmosphere is peaceful, sophisticated, and high-end, utilizing soft shadows and blue accents to create depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYBUpnW9RR2Nv9Qj8DxIWc9fE46LF-r3R7yY9uZUjBCJoRvkLvvOn1Oak2ttTdFy6JWSThC1ke6ZVRy4Uwz3BLYg5CLG38-XEPY7UudclFCgYrxVytPkGoe8vxy8YIPegG1sbwpuVeTaaL6xY13uibxUH_J9VaTauBHhDZprk_kq_C8sWoNcRu_PizEyn3Caef29d5qlt0z8smJID94PWIZKLK7sggYA1Brz_ViL3OcTkaBCDgynIFVzJ1V1T1UTCVzxjtVhtm8rjA">
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1 truncate">Higher Ground</h4>
+<p class="font-label-sm text-label-sm text-outline">2023 • EP</p>
+</div>
+<!-- Album Card 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden mb-4 shadow-[0px_10px_30px_rgba(0,119,182,0.05)] border border-primary-fixed/20 group-hover:scale-[1.02] transition-transform duration-300">
+<img alt="Album" class="w-full h-full object-cover" data-alt="Worship album artwork depicting a soft-focus mountain peak illuminated by a golden halo. The visual style is ethereal and serene, using sky blue gradients and white space for a clean, transcendental look." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZCUaW4hhqmK9BcvU-Wy3XMhTtOlkA_lR4OQi0CKUdzTqua-0hknkdXxIaRsRV4pKvcMUfYoQX4gw_pSUz-R1iQy5G3AGVwaxEOiRYgdidnhjMK90YEeQ2iG8TldxHZyhuMHaM6OLuQFDC2hq6Q3kTJ75JcjpsNMxe7qUQrZyyc4Wa-D1SyEtzOa8ctjIooBo1si0WnwFP_ZbD_QHjLk_dugPjWNwex6YxTpupyDQoSPCmb2A8CBVsvJxCDwTeU1bQEdGJB_uDPba5">
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1 truncate">Sanctuary Live</h4>
+<p class="font-label-sm text-label-sm text-outline">2022 • Album</p>
+</div>
+<!-- Album Card 4 -->
+<div class="group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden mb-4 shadow-[0px_10px_30px_rgba(0,119,182,0.05)] border border-primary-fixed/20 group-hover:scale-[1.02] transition-transform duration-300">
+<img alt="Album" class="w-full h-full object-cover" data-alt="A minimalist and bright album art featuring a stylized dove in gold foil over an Alice Blue background. The mood is one of hope and transcendence, following the Divine Light design system's principles of clarity and light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJPRDTnZtzspQGJZtzGm0W1fG6sAYjxGpBq3rqhuaKeV8RpohT_Seiu5gImjIVF00FEmex1Ysxk0DuzzU77J-oqjsqfpA6GdqtLt2TAm_eJFnZBi-L3IqNwe4h9D0WCq5UeQLiRhJCGlaKA678j3SElp_073LHunq53ptjxjF_xF6jXGB0jQ0xHywEO_o6Vww8PUGIpnBGBrtKveIgmqZPx77eci72fZhSugdWzvdBsgFSA0Zv0rQp-hXmOUzmo6hHq0Ky8M1g9bfT">
+</div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1 truncate">Spirit Lead</h4>
+<p class="font-label-sm text-label-sm text-outline">2022 • Single</p>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Collaborations & About -->
+<div class="lg:col-span-4 space-y-xl">
+<!-- Collaborations -->
+<section class="glass-panel p-6 rounded-3xl border border-white/40 shadow-xl">
+<h2 class="font-headline-sm text-headline-sm mb-gutter">Collaborations</h2>
+<div class="space-y-gutter">
+<!-- Collaborator 1 -->
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-14 h-14 rounded-full overflow-hidden bg-primary-fixed">
+<img alt="Artist" class="w-full h-full object-cover" data-alt="A portrait of a male musician in a clean white linen shirt, set against a soft blue studio background. The lighting is high-key and diffused, creating a serene and professional aesthetic that matches the Divine Light brand system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQTlBJTOY9Ta_iwfJt7EcJz46gMqWjU5cZa_fPFkKUWilwI7CCb75GqDW97yBcD4C8zzNHRjhbCmsMw6oSSv85d3aYxK1Btxry2DxOej7KVDgP-wQ00hX8Ty1CwvN4b3kPyo9iI9JnLdRJ6mSkrJof5lSdnMXOn7SHoKjrQrgjtpddRK2jt96WOB5QD9SFRZNOq3PT6TKb1O9jthDuCVDGAjyK1xmWuZiA1k3RYftWR0PQjijStyw4Kb3xY5b0B1KVX88ND7mKEWiR">
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Elias Thorne</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Praise Leader</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-outline group-hover:text-primary" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Collaborator 2 -->
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-14 h-14 rounded-full overflow-hidden bg-primary-fixed">
+<img alt="Artist" class="w-full h-full object-cover" data-alt="Portrait of a female vocalist with a serene expression, illuminated by warm golden lighting that suggests a sacred sunset. The style is minimalist and clean, consistent with modern Christian worship aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD12UQaHedIC5LsN3b0v412Le0PLMz1CHp4NKnyamzNUZrNtmOORocFxS9uECWs42OrziEqdDSmgSiasHXzBpv1jrSZHMtDS2b-fI2kLwGDBCNCdrCNTCzXEJjh-JS7op9oV4ZJ_WDynyJMzerxJHsRQus1Ij1FQOntvdTF9TSiepzSTUSJ-lFTWd15YhPcYtfjRzpSq9Hism7BGiTb3ltZgaLp6w7i6d7qvxipfgml3vK51AzJeTmapdHt5oZ45cHxBTEvCKXhRPcd">
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">Aria Brooks</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Vocalist</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-outline group-hover:text-primary" data-icon="chevron_right">chevron_right</span>
+</div>
+<!-- Collaborator 3 -->
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-14 h-14 rounded-full overflow-hidden bg-primary-fixed">
+<img alt="Artist" class="w-full h-full object-cover" data-alt="A portrait of a male pianist in a bright, minimalist setting with large windows. The aesthetic is airy and light-filled, using sky blue and white to evoke a sense of transcendence and peace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYCHn9vBHquDoAWULGPeK-rzQVK9kFnOwvJbxua2Z_ddMalRIz4jAwgDXaEbUo7E9HXdt-RAYBi7xwKcjKZKUmQxdumej0mBKdQAH30ABHeNdr-HaKM5a7wA5SdRGFPDvydMHvK11mZaSrkpiO5oZoKiRAJtzlYkYiKTo72xiuzN2VKTDUvsbxBsbTvTedP1jSTl9ZZPJX_GyGi2S31PoraOS4DlpNhL-jF_WSPVhvojs6GsxAkLdVyY8LCJ56Te0vc3BA-xXB-D3D">
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface group-hover:text-primary transition-colors">The Heights Collective</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Worship Band</p>
+</div>
+<span class="material-symbols-outlined ml-auto text-outline group-hover:text-primary" data-icon="chevron_right">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Artist Bio Card -->
+<section class="p-6 rounded-3xl bg-surface-container-low">
+<h2 class="font-headline-sm text-headline-sm mb-4">About the Artist</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mb-6">
+                        Selah Grace is a songwriter and worship leader known for her ethereal melodies and soul-stirring lyrics. Since her debut in 2018, she has touched millions with a sound that bridges contemporary worship and transcendental pop.
+                    </p>
+<div class="flex gap-4">
+<span class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary shadow-sm hover:text-secondary transition-colors cursor-pointer"><i class="material-symbols-outlined" data-icon="public">public</i></span>
+<span class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-primary shadow-sm hover:text-secondary transition-colors cursor-pointer"><i class="material-symbols-outlined" data-icon="share">share</i></span>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Persistent Player Bar -->
+<footer class="fixed bottom-0 w-full z-50 glass-panel border-t border-white/20 px-margin-mobile md:px-margin-desktop py-4 shadow-[0px_-10px_30px_rgba(0,119,182,0.08)]">
+<div class="max-w-max-width mx-auto flex items-center justify-between gap-gutter">
+<!-- Now Playing Track Info -->
+<div class="flex items-center gap-4 w-1/3 overflow-hidden">
+<div class="w-12 h-12 rounded-lg overflow-hidden bg-primary-fixed shrink-0 animate-pulse">
+<img alt="Playing" class="w-full h-full object-cover" data-alt="Album art showing a peaceful sky at dawn with gold and sky blue gradients, minimalist and modern for a contemporary worship album." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcFyR68oyXMNjBYrLs9Wg7VMbqNzp1VMYA7dQkoyq36mgKDk7nJ-vD5aZ1VDOwu3_tNWtzconJ6GbPCBcyqYW96mYG4NhgoaSoRo_P5NNzGoUBk_StH_aE5Nj9LEfsyMJFN9JPuOrMsCIAH6oHBmdScGo8Jp0fTaqZcKQoVWww6bEa6jxwAuoAAgi3NOGEJgsNSx_DQZIT0sP4m5AVyo_M4RazCHv5QzZhm215FRZQzLl-iyl5rTSv0WCioi43ftMGdOIpR385hmsi">
+</div>
+<div class="truncate">
+<h5 class="font-body-md text-body-md text-on-surface truncate">Echoes of Eternity</h5>
+<p class="font-display-lg-mobile italic text-[14px] text-primary truncate" style="line-height: 1;">Selah Grace</p>
+</div>
+</div>
+<!-- Player Controls -->
+<div class="flex flex-col items-center gap-1 w-1/3">
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors" data-icon="shuffle">shuffle</button>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors" data-icon="skip_previous">skip_previous</button>
+<button class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-lg hover:scale-105 transition-transform" id="playBtn">
+<span class="material-symbols-outlined" data-icon="pause" data-weight="fill" id="playIcon">pause</span>
+</button>
+<button class="material-symbols-outlined text-on-surface hover:text-primary transition-colors" data-icon="skip_next">skip_next</button>
+<button class="material-symbols-outlined text-outline hover:text-primary transition-colors" data-icon="repeat">repeat</button>
+</div>
+<!-- Progress Waveform (Simplified Representation) -->
+<div class="w-full h-6 flex items-center gap-[2px] pt-1" id="waveform-container">
+<!-- Bars will be generated by JS -->
+<div class="waveform-bar h-full" style="height: 95.4091%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 44.4609%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 49.4372%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 75.2384%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 42.1436%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 85.9437%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 55.5922%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 20.3008%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 85.3525%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 83.4924%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 47.4538%; opacity: 1;"></div><div class="waveform-bar h-full" style="height: 76.2395%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 92.8018%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 54.1578%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 20.5471%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 85.6979%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 77.8464%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 72.1304%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 53.9383%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 36.0175%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 26.9953%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 86.5237%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 99.5647%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 92.0362%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 37.5098%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 52.6693%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 87.4625%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 29.2958%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 89.4594%; opacity: 0.3;"></div><div class="waveform-bar h-full" style="height: 20%; opacity: 0.3;"></div></div>
+</div>
+<!-- Volume and Extras -->
+<div class="hidden md:flex items-center justify-end gap-6 w-1/3">
+<button class="material-symbols-outlined text-outline hover:text-primary" data-icon="lyrics">lyrics</button>
+<button class="material-symbols-outlined text-outline hover:text-primary" data-icon="queue_music">queue_music</button>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline" data-icon="volume_up">volume_up</span>
+<div class="w-24 h-1 bg-surface-container rounded-full overflow-hidden">
+<div class="w-2/3 h-full bg-primary-container"></div>
+</div>
+</div>
+</div>
+</div>
+</footer>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-safe px-4 bg-surface/60 backdrop-blur-xl z-50 rounded-t-xl shadow-[0px_-10px_30px_rgba(0,119,182,0.08)] hidden">
+<!-- Using Hidden since Player Bar takes prominence, but structure is here for logic -->
+</nav>
+<script>
+        // Generate simulated waveform bars
+        const waveformContainer = document.getElementById('waveform-container');
+        if (waveformContainer) {
+            for (let i = 0; i < 40; i++) {
+                const height = Math.random() * 100;
+                const bar = document.createElement('div');
+                bar.className = 'waveform-bar h-full';
+                bar.style.height = `${Math.max(20, height)}%`;
+                if (i < 15) bar.style.opacity = '1';
+                else bar.style.opacity = '0.3';
+                waveformContainer.appendChild(bar);
+            }
+        }
+
+        // Simple Toggle for Play/Pause
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        let isPlaying = true;
+
+        playBtn.addEventListener('click', () => {
+            isPlaying = !isPlaying;
+            playIcon.textContent = isPlaying ? 'pause' : 'play_arrow';
+            playIcon.setAttribute('data-icon', isPlaying ? 'pause' : 'play_arrow');
+        });
+
+        // Sticky Header Effect
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('bg-surface/90');
+                header.classList.remove('bg-surface/60');
+            } else {
+                header.classList.remove('bg-surface/90');
+                header.classList.add('bg-surface/60');
+            }
+        });
+    </script>
+
+
+</body></html>

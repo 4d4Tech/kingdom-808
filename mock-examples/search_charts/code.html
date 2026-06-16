@@ -1,0 +1,470 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>TrinitySound - Search &amp; Rankings</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e2e2e2",
+                    "on-surface": "#1a1c1c",
+                    "surface-bright": "#f9f9f9",
+                    "tertiary": "#515a5f",
+                    "surface-container-highest": "#e2e2e2",
+                    "tertiary-fixed-dim": "#bfc8ce",
+                    "surface-container-high": "#e8e8e8",
+                    "inverse-primary": "#94ccff",
+                    "on-secondary-fixed": "#241a00",
+                    "secondary-fixed-dim": "#e9c349",
+                    "error": "#ba1a1a",
+                    "inverse-surface": "#2f3131",
+                    "on-primary-container": "#f3f7ff",
+                    "on-primary": "#ffffff",
+                    "background": "#f9f9f9",
+                    "outline-variant": "#bfc7d1",
+                    "on-secondary-fixed-variant": "#574500",
+                    "primary-container": "#0077b6",
+                    "surface": "#f9f9f9",
+                    "on-tertiary-fixed": "#151d22",
+                    "primary-fixed": "#cde5ff",
+                    "on-surface-variant": "#404850",
+                    "surface-tint": "#006399",
+                    "inverse-on-surface": "#f0f1f1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#745c00",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-dim": "#dadada",
+                    "on-tertiary-container": "#f0f8ff",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#94ccff",
+                    "on-background": "#1a1c1c",
+                    "tertiary-container": "#6a7278",
+                    "tertiary-fixed": "#dbe4ea",
+                    "secondary-fixed": "#ffe088",
+                    "secondary-container": "#fed65b",
+                    "surface-container-low": "#f3f3f4",
+                    "on-primary-fixed-variant": "#004b74",
+                    "outline": "#707881",
+                    "on-tertiary-fixed-variant": "#40484d",
+                    "surface-container": "#eeeeee",
+                    "secondary": "#735c00",
+                    "error-container": "#ffdad6",
+                    "primary": "#005d90",
+                    "on-primary-fixed": "#001d32"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "24px",
+                    "base": "8px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "lg": "48px",
+                    "margin-desktop": "64px",
+                    "xs": "4px",
+                    "xl": "80px",
+                    "sm": "12px",
+                    "max-width": "1440px"
+            },
+            "fontFamily": {
+                    "display-lg-mobile": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "label-sm": ["Geist"],
+                    "body-lg": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "body-md": ["Geist"],
+                    "headline-sm": ["Playfair Display"],
+                    "label-md": ["Geist"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-effect {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .divine-shadow {
+            box-shadow: 0px 10px 30px rgba(0, 119, 182, 0.08);
+        }
+        .divine-glow {
+            box-shadow: 0px 0px 20px rgba(212, 175, 55, 0.15);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface selection:bg-primary-fixed-dim">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl flex justify-between items-center px-margin-mobile h-16 shadow-[0px_10px_30px_rgba(0,119,182,0.08)]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">waves</span>
+<span class="font-headline-sm text-headline-sm text-primary italic">TRINITY<i class="italic">Sound</i></span>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-primary hover:opacity-80 transition-opacity">search</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary-fixed">
+<img class="w-full h-full object-cover" data-alt="A professional close-up portrait of a serene individual in a bright, ethereal studio setting with soft sky-blue backlighting. The aesthetic is clean and modern, representing a user profile in a high-end spiritual music application. The lighting is soft and high-key, creating a peaceful and welcoming divine light atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlCKcTr_zdEery8FDm4H7DZYxSx75OdLgCczpsFEdZ90VAvod0k3dY67G0ELJeQH1PDXmsl0VaWRgdyyf2iiujeFOmWZPGPnLvfUhp0baDKNtW8BmKRoWOvaN4E9JyiE2GkJK51BByQY1djmftOoSc0kb1TIMMfnOUOo1Z7aAccAQmSBGPgt7GzIk2V5otOFE367IY5KFaqxZCCr4G9VMX3fShjZtRulCPTRAGzkhRRCb0uIA5Eu2jrha9RP4WAwk_Cxv40jXWVg72">
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+<!-- Search Section -->
+<section class="mb-lg">
+<div class="relative max-w-2xl mx-auto group">
+<input class="w-full h-14 bg-surface-container-low border-none border-b-2 border-transparent focus:ring-0 focus:border-primary-container rounded-xl px-14 font-body-md text-on-surface transition-all divine-shadow group-hover:divine-glow" placeholder="Discover worship, gospel, and praise..." type="text">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 flex gap-2">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors">mic</span>
+</div>
+</div>
+</section>
+<!-- Top 100 Dynamic Chart (Bento Style) -->
+<section class="mb-xl">
+<div class="flex justify-between items-end mb-md">
+<div>
+<h2 class="font-headline-md text-headline-md text-on-surface">The Celestial 100</h2>
+<p class="font-body-sm text-body-sm text-outline">Constantly curated movements in the spirit of music</p>
+</div>
+<button class="text-primary font-label-md hover:underline">View All Charts</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Rank 1 Card -->
+<div class="md:col-span-2 relative group overflow-hidden rounded-xl h-[400px] divine-shadow bg-surface-container-highest">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A cinematic, high-angle shot of a majestic worship concert with a sea of hands raised toward a stage bathed in brilliant golden and sky-blue light. Volumetric lighting rays pierce through a subtle mist, creating a transcendent and spiritual atmosphere. The scene feels expansive and divine, capturing the essence of modern worship music." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPMbVvZrVRGlkZy9EL8pSeNmXY-KDVcw-Z_e868L5chkXYniur27nQks7IbY-0NegMQSV3HFkVQ7Lf_akKlQW1IdKl6h-nRyWdL2NmCSn2Jo5ynuuFh4OlGXIkgOg6BSOQuu2e8MSfWAbcjW-TBZ7utaA21qaJcDyz9LVVCeRGnzvROycuvawTEKOlhB7Hga8pzv-kTIk21SB_FULBHxsSVft4dwQjToQmVeBvp_duxhavAL8hx9j2zMs9PAnCiiO39SClu5M5lRom">
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/80 via-transparent to-transparent"></div>
+<div class="absolute top-6 left-6 flex items-center gap-3">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center divine-glow">
+<span class="text-on-secondary-container font-headline-sm">1</span>
+</div>
+<div class="bg-surface/30 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary-fixed-dim text-sm" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="text-white font-label-sm">Steady at #1</span>
+</div>
+</div>
+<div class="absolute bottom-6 left-6 right-6">
+<h3 class="font-headline-sm text-headline-sm text-white mb-1">Ocean of Grace (Live)</h3>
+<p class="font-body-md text-white/80">Trinity Worship Collective</p>
+</div>
+<button class="absolute bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-white flex items-center justify-center divine-shadow hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+</div>
+<!-- Rankings List Sidebar -->
+<div class="flex flex-col gap-base">
+<!-- Rank 2-5 Mini Cards -->
+<div class="bg-surface-container-low rounded-xl p-4 flex items-center gap-4 group hover:bg-surface-container-high transition-colors divine-shadow">
+<div class="font-headline-sm text-outline w-6">2</div>
+<img class="w-16 h-16 rounded-lg object-cover" data-alt="A high-quality square album cover featuring a minimalist white cross against a soft pastel sky gradient of pink and blue. The visual style is clean, editorial, and spiritual, with a heavy emphasis on whitespace and a peaceful, transcendent mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBItg8fITWrq3vMmIfYAqq6xQQNAbhN8ElYnaltYq7sjQsj-YzV8Ob6jmue5DlwKnxOxkBTLEFwOJpo5CA-yOSGFIqqwsoPrwNSuuIMXUwVgH5FrhMpydD0dEMizkBl6_QSmGP5Ql7M3BdRjLUldEG6odDwi7q2Auue8Oi8umXKkN-KmCwZ86LsncIsdb1zOGvzSN2qzGejXmd14QUlVCZEvbs3-bn4WqpYaN3DofIIA4EicnxON01CqRD4vAaoFkGXGGyIlfkbgGuS">
+<div class="flex-grow">
+<h4 class="font-label-md text-on-surface">Eternal Light</h4>
+<p class="font-body-sm text-outline">Sarah Joy</p>
+</div>
+<span class="material-symbols-outlined text-primary text-sm">trending_up</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-4 flex items-center gap-4 group hover:bg-surface-container-high transition-colors divine-shadow">
+<div class="font-headline-sm text-outline w-6">3</div>
+<img class="w-16 h-16 rounded-lg object-cover" data-alt="Close-up of a person playing an acoustic guitar in a softly lit church hall. Dust motes dance in single beams of sunlight coming through stained glass windows. The atmosphere is quiet, reflective, and deeply spiritual, with warm wood tones and soft blue shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU8DnWTx9oHEg8RedWUJtSRHZLLW-lYfS1UtxlBXv0iXb4_ZRRn-_Hn-GG132aDCqvmvXg-LR5xT4tST1jiJQYKYUYSdFG7C2fiZ0To4j9yU1Eap9nlMCoapwzC3wbOyBvp9nx78rB4LGMyIbSs2u0zp2cYOMQasXwbRjl1RqjIjDdAChAreieM-nNIiuFlQWREtiAKeA4suXRYU2oZ-sdPWi9jI3uFhQ9DFYHe7voPubvzWDboiRlqNq-ZAtkhwHvI1RjGDOQtTt9">
+<div class="flex-grow">
+<h4 class="font-label-md text-on-surface">Still Waters</h4>
+<p class="font-body-sm text-outline">Reflect &amp; Pray</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant text-sm">remove</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-4 flex items-center gap-4 group hover:bg-surface-container-high transition-colors divine-shadow">
+<div class="font-headline-sm text-outline w-6">4</div>
+<img class="w-16 h-16 rounded-lg object-cover" data-alt="A vibrant gospel choir singing with joy, wearing bright white robes. The background is a modern church stage with blue and gold atmospheric lighting. The photo captures movement and spiritual energy, with a high-key, bright light-mode aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTTJSXvDj6JCyGnGO-TCFaw0nsBh6fOdENZwDySKtpj_G9tUxfm8pv59CIDoVxFFCTLSziVZrv-gRT4W0dICxX0iEUlBfNfSL1GydzXngfQdT8egj8NAvbdONSYRRBLZSwEO499XP732A5Y1Ss3FM4IX9zRp0UEq9m5WOyvwFADKXorFRIlFiIQ2yzLzca-3OH4YId1Y6gkQe8m_LKRwYkkS_APSSVdiIon1vtFVm7bNYKlTPla-RDupRMsyOI91rYvU6MS7Om40bd">
+<div class="flex-grow">
+<h4 class="font-label-md text-on-surface">Victory Shout</h4>
+<p class="font-body-sm text-outline">Zion Mass Choir</p>
+</div>
+<span class="material-symbols-outlined text-error text-sm">trending_down</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-4 flex items-center gap-4 group hover:bg-surface-container-high transition-colors divine-shadow">
+<div class="font-headline-sm text-outline w-6">5</div>
+<div class="w-16 h-16 bg-primary-container rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white">new_releases</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-label-md text-on-surface">New Horizon</h4>
+<p class="font-body-sm text-outline">Kingdom Crew</p>
+</div>
+<span class="text-primary font-label-sm">NEW</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Top 10 Weekly/Monthly Carousels -->
+<section class="mb-xl">
+<div class="flex flex-col gap-lg">
+<!-- Weekly -->
+<div>
+<h3 class="font-headline-sm text-headline-sm mb-md flex items-center gap-2">
+                        Top 10 This Week
+                        <span class="material-symbols-outlined text-secondary">workspace_premium</span>
+</h3>
+<div class="flex overflow-x-auto gap-gutter pb-4 hide-scrollbar">
+<!-- Carousel Item Loop -->
+<div class="flex-shrink-0 w-44 group">
+<div class="relative mb-3">
+<img class="w-44 h-44 rounded-xl object-cover divine-shadow group-hover:scale-[1.02] transition-transform" data-alt="Digital art of a golden laurel wreath floating over a glass-like surface with soft blue reflections. The design is clean and elegant, representing musical excellence and high rankings. The lighting is ethereal and bright, consistent with a divine light theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNFPxo3peUZv9VHu1mCjUfrHQMrKr-z22X6Xueb-x7btxqa_xEDEWOJDWvspK6jI7MSSeVw5qlct7WTfiEctwCO5zMPd183DDQaWqD0pvr6sXljK8c5k7LN3e2HaK3U-i58XCdHMrdqhx_a7_fwWPKCNot8C_-0HRWLsxMWtun1YXIYbEvrAO0uh8tJzy-mmnSnXaxOugb0GwOwkMN1uxRAq6yWZp1H8xeMj-EicfA5vU0a7R8chgyDc_9BrQi2cXae7j-J0x5SrXc">
+<div class="absolute -top-2 -left-2 w-10 h-10 bg-surface rounded-full flex items-center justify-center font-headline-sm text-primary shadow-lg border border-primary-fixed">1</div>
+</div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Broken Vessels</h4>
+<p class="font-body-sm text-outline">Hillsong United</p>
+</div>
+<div class="flex-shrink-0 w-44 group">
+<div class="relative mb-3">
+<img class="w-44 h-44 rounded-xl object-cover divine-shadow group-hover:scale-[1.02] transition-transform" data-alt="A wide stage with a bright, luminous white cross in the background. The foreground is filled with a soft blue atmospheric haze and subtle golden light sparks. It creates a feeling of a spiritual sanctuary for music." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOEczASKFbDqWw4SkemHSa-o9A7fr_z6vn29RRRIJbipAGO_EBn3OO98a4uBrnoUxePMC0ySz1Y-m2kJx2sKUlttDexkhBRkYKXd-FsaceyirKvK_NK5lCKbi_XBBdYE_0twEZ2tp_6UMu0L1kGytGR7lcvyJlG8SIMz0411HbWCj2VpOn-nvLShdtVGTPXxRLCbjz5ks3Tq5Kzs4qEpMk0kDBiUUK2ydLZXTdbdiXFbIxD6j0W1l0OBe4LjB_roG62i31igwxPPxN">
+<div class="absolute -top-2 -left-2 w-10 h-10 bg-surface rounded-full flex items-center justify-center font-headline-sm text-primary shadow-lg border border-primary-fixed">2</div>
+</div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Way Maker</h4>
+<p class="font-body-sm text-outline">Leeland</p>
+</div>
+<div class="flex-shrink-0 w-44 group">
+<div class="relative mb-3">
+<img class="w-44 h-44 rounded-xl object-cover divine-shadow group-hover:scale-[1.02] transition-transform" data-alt="Abstract representation of light rays beaming through clouds, rendered in high-key white and soft cerulean blue. The image is serene, weightless, and uplifting, perfectly suited for spiritual gospel music cover art." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuMAkiBT5vg37T6uHav5ZGyOimQjyQVCCir6dCPXfTtFrMm1VsstWylaHxWXAnst8nzDmc8jNlouP3Bd8LEqbniTr_lMBZ8pcDZlc_CPeHM_EClDlGdRVAvcW6_XBn_Y_nN4tamPPXWzgFjZyS0tJuktDR02XVDLpWWdJYoNoS2XDg1KLVY5fNVe2H7bufD9un1cs-GZ3h-gNZ1FpJRd8o7FONcKSUXGfeRaCrqt9vK5ErV4rw-wCIg_RR5oxY3tw-UWr5cTJc_MR1">
+<div class="absolute -top-2 -left-2 w-10 h-10 bg-surface rounded-full flex items-center justify-center font-headline-sm text-primary shadow-lg border border-primary-fixed">3</div>
+</div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Firm Foundation</h4>
+<p class="font-body-sm text-outline">Cody Carnes</p>
+</div>
+<div class="flex-shrink-0 w-44 group">
+<div class="relative mb-3">
+<img class="w-44 h-44 rounded-xl object-cover divine-shadow group-hover:scale-[1.02] transition-transform" data-alt="A soft-focus photograph of a high-tech modern studio with glass panels and soft blue LED lighting. The environment is clean, minimalist, and peaceful, suggesting a place of creation for divine music." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4wpcPxI3DUHrs2nCDfZGxXBpNWldUXJy_FoOXkeY2ghiCsrLzTDVv9mtl2WMo-KbV6cqUVDb1VuEzCdOKa-fvYDhj5XJ39-sl-26R_xKMPnX1UxLU_t5g1ZM3_W5Nqt-NYhLFUUvTjBE6xx-3wFRaik_VBONsQwzYrosuK35RLkTzdx9J6g7P4SbaPuZ20B9Mtc5ycdnzsoR9RHDMYM3igqrjNDIXctTt8Ah-A63BsF45KGa6uhI0en0aFjUsKywEGhHmODUwrcVx">
+<div class="absolute -top-2 -left-2 w-10 h-10 bg-surface rounded-full flex items-center justify-center font-headline-sm text-primary shadow-lg border border-primary-fixed">4</div>
+</div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Gratitude</h4>
+<p class="font-body-sm text-outline">Brandon Lake</p>
+</div>
+<div class="flex-shrink-0 w-44 group">
+<div class="relative mb-3">
+<img class="w-44 h-44 rounded-xl object-cover divine-shadow group-hover:scale-[1.02] transition-transform" data-alt="Close-up of a bird flying through a bright, sunlit sky with soft clouds. The lighting is golden and high-key, conveying freedom and spiritual elevation. The colors are primarily warm golds and soft blues." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtoajMN_VNRthZvLD4LSp5x31vpNrrlPKLcWk_5YkjSpuSIojutMeSrDnFkJSRx3EEiXNjvh9jhP-LzT7K0DV9Kw_1e_-J0MhpbDJ7GvYCUOmknop-LoX5nbeIuHJ-nxF_j7YqGUhiPM65Ug2N_QdBINZaB1uCFw8RPBBLOjQ9ftttf2t6ppp_i2m85STJM1F8srFGRNTrIoTCsyq_FpEtroL9f1CRlG-RBEoAMOT2tyhErDMfMKZhvvmQNf5aHdfKznlzuHIM1e2s">
+<div class="absolute -top-2 -left-2 w-10 h-10 bg-surface rounded-full flex items-center justify-center font-headline-sm text-primary shadow-lg border border-primary-fixed">5</div>
+</div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Freedom</h4>
+<p class="font-body-sm text-outline">Jesus Culture</p>
+</div>
+</div>
+</div>
+<!-- Monthly -->
+<div>
+<h3 class="font-headline-sm text-headline-sm mb-md flex items-center gap-2">
+                        Top 10 This Month
+                        <span class="material-symbols-outlined text-primary">calendar_month</span>
+</h3>
+<div class="flex overflow-x-auto gap-gutter pb-4 hide-scrollbar">
+<!-- Items continue similar to weekly -->
+<!-- Placeholder for brevity -->
+<div class="flex-shrink-0 w-44 group">
+<div class="relative mb-3">
+<img class="w-44 h-44 rounded-xl object-cover divine-shadow" data-alt="Artistic rendering of sound waves as flowing golden particles moving through a deep blue space. The particles create a sense of divine energy and transcendence. The aesthetic is modern, high-tech, and ethereal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5_24t59tPvA07Jf5rUPzKFN9yGH5lTSQUmpKdaVUzYhWiA5-nAC-AY4a6-xDV_JVeTkbYLf9LvjF3h2u2cn94NCVAVDeIvrh-yMRt5eE3ibbySQv5ozLd3Ua9x-gR9jUd63Q1b9Obp3WfE2KpG_15DLrRD8-Wr6d9HcjCzf1xFxcr-yBPGlG4w5DkZpljWweTBSp7sVPv1JLNKIeIueWLJFMqTBr6gbkSfCWxn-VSi46CZzTZzj7tC0j_aFq5cCFP98BlYkjGkYOa">
+<div class="absolute -top-2 -left-2 w-10 h-10 bg-surface rounded-full flex items-center justify-center font-headline-sm text-primary shadow-lg border border-primary-fixed">1</div>
+</div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Jireh</h4>
+<p class="font-body-sm text-outline">Maverick City Music</p>
+</div>
+<!-- ... 4 more items ... -->
+<div class="flex-shrink-0 w-44 group">
+<div class="relative mb-3">
+<img class="w-44 h-44 rounded-xl object-cover divine-shadow" data-alt="A modern worship stage with soft white and light blue stage lights creating a cross pattern on the floor. The atmosphere is expectant and holy, with a clean, light-mode minimalist feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlbHbo715b1b8DLqsnIVEk8OA2mjPJv8DTdEUiTYRC_UI-0-fdtxuTmXfm4vWcNOZVilawQT_EO7ksRCiypoiXqDEbozx7sMfyCR2mFepduxk6z3-wbP7T4BKF--Lt_CLDdPE3Nc50dHsmdy_YEPl0n-kBvKvFUnDA1L2xGX_S0UwjnRaPUWo0J9-PiE_iuXadEKxyCD76u8SxpuzGCRzsbmGG_ym8BMji-P3QXc_QEHgQxNgpTOchUp_1fUwugfkPUtK6tZz9hDp1">
+<div class="absolute -top-2 -left-2 w-10 h-10 bg-surface rounded-full flex items-center justify-center font-headline-sm text-primary shadow-lg border border-primary-fixed">2</div>
+</div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Promises</h4>
+<p class="font-body-sm text-outline">Maverick City Music</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Genre Specific Top 10 Lists -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-lg mb-xl">
+<!-- Worship -->
+<div class="bg-surface-container-low rounded-2xl p-6 divine-shadow">
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-headline-sm text-headline-sm">Worship</h3>
+<span class="text-primary font-label-md px-3 py-1 bg-primary-fixed rounded-full">Top 10</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<span class="font-label-md text-primary w-4">1</span>
+<p class="font-body-md text-on-surface flex-grow">Agnus Dei</p>
+<span class="material-symbols-outlined text-secondary-fixed-dim text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-outline w-4">2</span>
+<p class="font-body-md text-on-surface flex-grow">Goodness of God</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-outline w-4">3</span>
+<p class="font-body-md text-on-surface flex-grow">The Blessing</p>
+</div>
+<!-- ... more ... -->
+</div>
+<button class="w-full mt-6 py-2 border border-primary-fixed rounded-xl text-primary font-label-md hover:bg-primary-fixed transition-colors">Explore Worship</button>
+</div>
+<!-- Gospel -->
+<div class="bg-surface-container-low rounded-2xl p-6 divine-shadow">
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-headline-sm text-headline-sm">Gospel</h3>
+<span class="text-primary font-label-md px-3 py-1 bg-primary-fixed rounded-full">Top 10</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<span class="font-label-md text-primary w-4">1</span>
+<p class="font-body-md text-on-surface flex-grow">Intentional</p>
+<span class="material-symbols-outlined text-secondary-fixed-dim text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-outline w-4">2</span>
+<p class="font-body-md text-on-surface flex-grow">I Smile</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-outline w-4">3</span>
+<p class="font-body-md text-on-surface flex-grow">Break Every Chain</p>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-primary-fixed rounded-xl text-primary font-label-md hover:bg-primary-fixed transition-colors">Explore Gospel</button>
+</div>
+<!-- Christian Hip Hop -->
+<div class="bg-surface-container-low rounded-2xl p-6 divine-shadow">
+<div class="flex items-center justify-between mb-md">
+<h3 class="font-headline-sm text-headline-sm">CHH</h3>
+<span class="text-primary font-label-md px-3 py-1 bg-primary-fixed rounded-full">Top 10</span>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<span class="font-label-md text-primary w-4">1</span>
+<p class="font-body-md text-on-surface flex-grow">Coming in Hot</p>
+<span class="material-symbols-outlined text-secondary-fixed-dim text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-outline w-4">2</span>
+<p class="font-body-md text-on-surface flex-grow">Church Clothes</p>
+</div>
+<div class="flex items-center gap-3">
+<span class="font-label-md text-outline w-4">3</span>
+<p class="font-body-md text-on-surface flex-grow">Fight for Me</p>
+</div>
+</div>
+<button class="w-full mt-6 py-2 border border-primary-fixed rounded-xl text-primary font-label-md hover:bg-primary-fixed transition-colors">Explore CHH</button>
+</div>
+</section>
+</main>
+<!-- Navigation Shells -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-safe px-4 bg-surface/60 backdrop-blur-xl rounded-t-xl shadow-[0px_-10px_30px_rgba(0,119,182,0.08)] z-50">
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:text-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:text-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined">library_music</span>
+<span class="font-label-sm text-label-sm">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:text-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-label-sm">Upload</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">search</span>
+<span class="font-label-sm text-label-sm">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline dark:text-outline-variant hover:text-primary-container transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<!-- Floating Audio Player Bar -->
+<div class="fixed bottom-20 left-4 right-4 h-16 bg-surface/80 backdrop-blur-lg rounded-xl flex items-center px-4 divine-shadow z-40 border border-white/20">
+<div class="flex items-center gap-3 w-1/3">
+<img class="w-10 h-10 rounded-lg" data-alt="Mini album thumbnail of a worship concert with golden volumetric light rays. The image is small but clear, representing the currently playing track in a music player interface. The aesthetic is peaceful and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCd4naxx4MR9ZsLJ9FvIGiL66uiE_eewv8vZ2mFCQfZgqNhpige18qECxvRVEao2Q8eck-_-zlkj0ITGWSkGr9Oyk6wgXXt01lvEJe7k4yBRZ6lMqwIhfoddWN_9Pwg44a6d4XeS5nlK3f6L3Q33s_Qs0ILfCWdPEhGkMLKZG39WKYVHN30hbza1ZGOo8h1CYSkC_waEMnBQi34mm3acBDUuDd5LsumdMwaV0ZHNnvRFS9lzo-8IpNN8mnJFeDuUQVNjvENA6JLNUN_">
+<div class="hidden sm:block overflow-hidden">
+<p class="font-body-sm font-semibold truncate text-on-surface">Ocean of Grace (Live)</p>
+<p class="font-label-sm italic text-outline truncate font-headline-sm">Trinity Worship Collective</p>
+</div>
+</div>
+<div class="flex-grow flex flex-col items-center justify-center">
+<div class="flex items-center gap-6">
+<button class="material-symbols-outlined text-outline">skip_previous</button>
+<button class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+<span class="material-symbols-outlined">play_arrow</span>
+</button>
+<button class="material-symbols-outlined text-outline">skip_next</button>
+</div>
+<!-- Progress Bar -->
+<div class="w-full max-w-md h-1 bg-surface-variant rounded-full mt-2 relative overflow-hidden">
+<div class="absolute inset-y-0 left-0 bg-primary w-1/3 shadow-[0_0_8px_rgba(0,119,182,0.5)]"></div>
+</div>
+</div>
+<div class="w-1/3 flex justify-end gap-3 text-outline">
+<button class="material-symbols-outlined hidden md:block">favorite</button>
+<button class="material-symbols-outlined">volume_up</button>
+</div>
+</div>
+<script>
+        // Simple micro-interaction for active state scaling
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('mousedown', () => {
+                link.classList.add('scale-95');
+            });
+            link.addEventListener('mouseup', () => {
+                link.classList.remove('scale-95');
+            });
+            link.addEventListener('mouseleave', () => {
+                link.classList.remove('scale-95');
+            });
+        });
+
+        // Search bar interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('divine-glow');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('divine-glow');
+        });
+    </script>
+
+
+</body></html>

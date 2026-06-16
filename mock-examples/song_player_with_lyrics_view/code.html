@@ -1,0 +1,388 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>TrinitySound - Now Playing</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Geist:wght@100..900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#f0f8ff",
+                    "primary-fixed-dim": "#94ccff",
+                    "on-secondary-fixed": "#241a00",
+                    "secondary-fixed": "#ffe088",
+                    "inverse-on-surface": "#f0f1f1",
+                    "inverse-surface": "#2f3131",
+                    "primary-fixed": "#cde5ff",
+                    "on-surface-variant": "#404850",
+                    "background": "#f9f9f9",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#001d32",
+                    "tertiary-fixed": "#dbe4ea",
+                    "surface-container-low": "#f3f3f4",
+                    "on-primary-container": "#f3f7ff",
+                    "secondary-container": "#fed65b",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "on-primary-fixed-variant": "#004b74",
+                    "inverse-primary": "#94ccff",
+                    "on-tertiary": "#ffffff",
+                    "surface-tint": "#006399",
+                    "on-secondary-fixed-variant": "#574500",
+                    "outline-variant": "#bfc7d1",
+                    "surface-container-highest": "#e2e2e2",
+                    "surface": "#f9f9f9",
+                    "tertiary-container": "#6a7278",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#151d22",
+                    "on-secondary-container": "#745c00",
+                    "surface-dim": "#dadada",
+                    "on-error-container": "#93000a",
+                    "secondary": "#735c00",
+                    "surface-container-high": "#e8e8e8",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed-variant": "#40484d",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#eeeeee",
+                    "tertiary-fixed-dim": "#bfc8ce",
+                    "on-background": "#1a1c1c",
+                    "surface-variant": "#e2e2e2",
+                    "primary": "#005d90",
+                    "outline": "#707881",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-bright": "#f9f9f9",
+                    "tertiary": "#515a5f",
+                    "secondary-fixed-dim": "#e9c349",
+                    "primary-container": "#0077b6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "max-width": "1440px",
+                    "base": "8px",
+                    "sm": "12px",
+                    "md": "24px",
+                    "xl": "80px",
+                    "margin-mobile": "16px",
+                    "lg": "48px",
+                    "xs": "4px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Geist"],
+                    "body-sm": ["Geist"],
+                    "label-md": ["Geist"],
+                    "headline-sm": ["Playfair Display"],
+                    "label-sm": ["Geist"],
+                    "body-md": ["Geist"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "label-sm": ["10px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f9f9f9;
+            color: #1a1c1c;
+            overflow-x: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .waveform-bar {
+            height: 64px;
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .waveform-segment {
+            flex: 1;
+            background: #bfc7d1;
+            border-radius: 1px;
+            transition: all 0.2s ease;
+        }
+        .waveform-segment.active {
+            background: #0077b6;
+        }
+        .divine-glow {
+            box-shadow: 0px 10px 30px rgba(0, 119, 182, 0.08);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #bfc7d1;
+            border-radius: 10px;
+        }
+        .lyric-line {
+            transition: all 0.3s ease;
+        }
+        .lyric-line.active {
+            color: #005d90;
+            font-weight: 700;
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        .lyric-line.inactive {
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-xl flex justify-between items-center px-margin-mobile h-16 shadow-[0px_10px_30px_rgba(0,119,182,0.08)]">
+<button class="hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary">expand_more</span>
+</button>
+<div class="font-headline-sm text-headline-sm text-primary italic">TRINITY<i class="italic">Sound</i></div>
+<button class="hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary" data-icon="search">search</span>
+</button>
+</header>
+<main class="max-w-[1440px] mx-auto pt-20 pb-32 px-margin-mobile md:px-margin-desktop min-h-screen flex flex-col items-center">
+<!-- Album Art Section -->
+<section class="w-full flex flex-col items-center mb-8">
+<div class="relative w-full max-w-[500px] aspect-square rounded-xl overflow-hidden divine-glow group">
+<img alt="Worship Album Art" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_8WYATclzFiTx28hn0YdrAMExdTwALtynWWZmbIgLosxxQO8r3ATKDShY8mbOvZBH5cMfiRo7THXBnzQdnWkQlXPF-qrKhPs3WH57vBjcJsETy6InaJ8OY8piuJfN-2yHjf3Oh5NQpr7Owyx2pQG1lYX4z1iPPCYul0mlg0bbhNlLDM5AhB0RXKWViUbvaFoMPyi3HgykWDPqWIr0mGFkE_O7KvHGpkZHhg3kZzGw873AH9QsV_mHPJT_DcvPntiP2cpMu9_nr1SX">
+<div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</div>
+</section>
+<!-- Track Info & Metadata -->
+<section class="w-full max-w-[800px] flex flex-col items-center text-center md:flex-row md:justify-between md:text-left mb-md">
+<div class="mb-4 md:mb-0">
+<h1 class="font-headline-md text-headline-md text-on-surface mb-xs">Echoes of Eternity</h1>
+<p class="font-headline-sm text-headline-sm text-primary italic">Selah Grace</p>
+</div>
+<button class="px-md h-12 rounded-full border border-primary text-primary font-label-md hover:bg-primary/5 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">person_add</span>
+                Follow
+            </button>
+</section>
+<!-- SoundCloud-Style Waveform -->
+<section class="w-full max-w-[1000px] mb-lg px-2">
+<div class="waveform-bar w-full cursor-pointer relative" id="waveform-container" onclick="seekWaveform(event)"><div class="waveform-segment active" style="height: 63.9787%;"></div><div class="waveform-segment active" style="height: 89.6307%;"></div><div class="waveform-segment active" style="height: 65.9701%;"></div><div class="waveform-segment active" style="height: 39.3043%;"></div><div class="waveform-segment active" style="height: 45.0467%;"></div><div class="waveform-segment active" style="height: 38.3476%;"></div><div class="waveform-segment active" style="height: 23.2304%;"></div><div class="waveform-segment active" style="height: 92.973%;"></div><div class="waveform-segment active" style="height: 40.2323%;"></div><div class="waveform-segment active" style="height: 61.0158%;"></div><div class="waveform-segment active" style="height: 57.0718%;"></div><div class="waveform-segment active" style="height: 50.3404%;"></div><div class="waveform-segment active" style="height: 40.2558%;"></div><div class="waveform-segment active" style="height: 86.4274%;"></div><div class="waveform-segment active" style="height: 63.5521%;"></div><div class="waveform-segment active" style="height: 61.0679%;"></div><div class="waveform-segment active" style="height: 55.6739%;"></div><div class="waveform-segment active" style="height: 78.8404%;"></div><div class="waveform-segment active" style="height: 87.5866%;"></div><div class="waveform-segment active" style="height: 26.2059%;"></div><div class="waveform-segment active" style="height: 24.3644%;"></div><div class="waveform-segment active" style="height: 79.3099%;"></div><div class="waveform-segment active" style="height: 88.4628%;"></div><div class="waveform-segment active" style="height: 79.5094%;"></div><div class="waveform-segment active" style="height: 63.6285%;"></div><div class="waveform-segment active" style="height: 22.3412%;"></div><div class="waveform-segment active" style="height: 64.2066%;"></div><div class="waveform-segment active" style="height: 42.403%;"></div><div class="waveform-segment active" style="height: 26.7715%;"></div><div class="waveform-segment active" style="height: 35.0027%;"></div><div class="waveform-segment active" style="height: 39.4894%;"></div><div class="waveform-segment active" style="height: 39.3495%;"></div><div class="waveform-segment active" style="height: 63.1272%;"></div><div class="waveform-segment active" style="height: 43.1055%;"></div><div class="waveform-segment active" style="height: 76.8687%;"></div><div class="waveform-segment active" style="height: 36.3268%;"></div><div class="waveform-segment active" style="height: 36.3554%;"></div><div class="waveform-segment active" style="height: 80.149%;"></div><div class="waveform-segment active" style="height: 67.7407%;"></div><div class="waveform-segment active" style="height: 73.1767%;"></div><div class="waveform-segment" style="height: 42.2519%;"></div><div class="waveform-segment" style="height: 68.9356%;"></div><div class="waveform-segment" style="height: 74.8402%;"></div><div class="waveform-segment" style="height: 86.112%;"></div><div class="waveform-segment" style="height: 28.9553%;"></div><div class="waveform-segment" style="height: 46.6907%;"></div><div class="waveform-segment" style="height: 52.0791%;"></div><div class="waveform-segment" style="height: 99.1797%;"></div><div class="waveform-segment" style="height: 80.6764%;"></div><div class="waveform-segment" style="height: 83.116%;"></div><div class="waveform-segment" style="height: 97.0384%;"></div><div class="waveform-segment" style="height: 90.231%;"></div><div class="waveform-segment" style="height: 42.528%;"></div><div class="waveform-segment" style="height: 69.6557%;"></div><div class="waveform-segment" style="height: 55.4028%;"></div><div class="waveform-segment" style="height: 91.1471%;"></div><div class="waveform-segment" style="height: 36.011%;"></div><div class="waveform-segment" style="height: 68.8117%;"></div><div class="waveform-segment" style="height: 43.891%;"></div><div class="waveform-segment" style="height: 45.0036%;"></div><div class="waveform-segment" style="height: 20.4164%;"></div><div class="waveform-segment" style="height: 47.9945%;"></div><div class="waveform-segment" style="height: 26.5171%;"></div><div class="waveform-segment" style="height: 48.3597%;"></div><div class="waveform-segment" style="height: 54.8965%;"></div><div class="waveform-segment" style="height: 66.2289%;"></div><div class="waveform-segment" style="height: 41.1553%;"></div><div class="waveform-segment" style="height: 91.622%;"></div><div class="waveform-segment" style="height: 94.3167%;"></div><div class="waveform-segment" style="height: 20.0434%;"></div><div class="waveform-segment" style="height: 65.6934%;"></div><div class="waveform-segment" style="height: 95.4492%;"></div><div class="waveform-segment" style="height: 91.5586%;"></div><div class="waveform-segment" style="height: 74.2868%;"></div><div class="waveform-segment" style="height: 76.069%;"></div><div class="waveform-segment" style="height: 89.4048%;"></div><div class="waveform-segment" style="height: 68.63%;"></div><div class="waveform-segment" style="height: 95.8194%;"></div><div class="waveform-segment" style="height: 56.8555%;"></div><div class="waveform-segment" style="height: 37.1339%;"></div><div class="waveform-segment" style="height: 62.86%;"></div><div class="waveform-segment" style="height: 81.7095%;"></div><div class="waveform-segment" style="height: 66.9515%;"></div><div class="waveform-segment" style="height: 70.3003%;"></div><div class="waveform-segment" style="height: 91.7944%;"></div><div class="waveform-segment" style="height: 98.3032%;"></div><div class="waveform-segment" style="height: 57.1464%;"></div><div class="waveform-segment" style="height: 24.4424%;"></div><div class="waveform-segment" style="height: 35.1028%;"></div><div class="waveform-segment" style="height: 98.945%;"></div><div class="waveform-segment" style="height: 52.8456%;"></div><div class="waveform-segment" style="height: 44.8513%;"></div><div class="waveform-segment" style="height: 53.7477%;"></div><div class="waveform-segment" style="height: 70.3759%;"></div><div class="waveform-segment" style="height: 52.6895%;"></div><div class="waveform-segment" style="height: 88.0984%;"></div><div class="waveform-segment" style="height: 26.8035%;"></div><div class="waveform-segment" style="height: 81.3037%;"></div><div class="waveform-segment" style="height: 75.6053%;"></div><div class="waveform-segment" style="height: 49.0367%;"></div></div>
+<div class="flex justify-between mt-xs px-1 text-label-sm text-outline font-label-sm">
+<span id="current-time" class="">1:42</span>
+<span id="total-time" class="">4:15</span>
+</div>
+</section>
+<!-- Playback Controls -->
+<section class="w-full max-w-[600px] flex justify-between items-center mb-lg">
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]">shuffle</span>
+</button>
+<button class="text-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[40px]">skip_previous</span>
+</button>
+<button class="w-20 h-20 bg-primary text-on-primary rounded-full flex items-center justify-center divine-glow hover:scale-105 active:scale-95 transition-all" onclick="togglePlay(this)">
+<span class="material-symbols-outlined text-[48px] fill-icon" id="play-pause-icon">pause</span>
+</button>
+<button class="text-primary hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[40px]">skip_next</span>
+</button>
+<button class="text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[28px]">repeat</span>
+</button>
+</section>
+<!-- Tabs Section: Lyrics, Scripture & Testimony -->
+<section class="w-full max-w-[800px] mb-lg">
+<div class="flex border-b border-outline-variant mb-md overflow-x-auto no-scrollbar">
+<button class="flex-1 min-w-[100px] pb-base font-label-md text-primary border-b-2 border-primary transition-all whitespace-nowrap" id="tab-lyrics" onclick="switchTab('lyrics')">Lyrics</button>
+<button class="flex-1 min-w-[100px] pb-base font-label-md text-outline hover:text-primary transition-all whitespace-nowrap" id="tab-scripture" onclick="switchTab('scripture')">Scripture</button>
+<button class="flex-1 min-w-[100px] pb-base font-label-md text-outline hover:text-primary transition-all whitespace-nowrap" id="tab-testimony" onclick="switchTab('testimony')">Testimony</button>
+</div>
+<!-- Lyrics Content -->
+<div class="space-y-md animate-in fade-in duration-500" id="content-lyrics">
+<div class="p-md bg-surface-container-low rounded-xl border border-outline-variant/30 text-center">
+<div class="space-y-6 font-headline-sm text-[22px] leading-relaxed">
+<div class="text-outline-variant text-label-md uppercase tracking-[0.2em] mb-2">[Verse 1]</div>
+<p class="lyric-line inactive">The morning breaks in silent grace</p>
+<p class="lyric-line inactive">I see the wonder of Your face</p>
+<p class="lyric-line active">In every breath, in every sigh</p>
+<p class="lyric-line inactive">Your love is written in the sky</p>
+<div class="text-outline-variant text-label-md uppercase tracking-[0.2em] mt-8 mb-2">[Chorus]</div>
+<p class="lyric-line inactive">Echoes of eternity</p>
+<p class="lyric-line inactive">Calling out to you and me</p>
+<p class="lyric-line inactive">Infinite and ever true</p>
+<p class="lyric-line inactive">Everything begins in You</p>
+</div>
+<div class="mt-lg pt-md border-t border-outline-variant/20 flex flex-col items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full">
+<span class="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
+<span class="text-label-sm text-primary/70 font-semibold uppercase tracking-wider">AI Generated</span>
+</div>
+<button class="flex items-center gap-2 text-primary font-label-md hover:underline">
+<span class="material-symbols-outlined text-[18px]">edit_note</span>
+                        Edit Lyrics
+                    </button>
+</div>
+</div>
+</div>
+<!-- Scripture Content -->
+<div class="hidden space-y-md animate-in fade-in duration-500" id="content-scripture">
+<div class="p-md bg-secondary-container/10 rounded-xl border border-secondary-container/20">
+<p class="font-headline-sm text-headline-sm italic text-secondary mb-base">"The Lord is my light and my salvation—whom shall I fear? The Lord is the stronghold of my life—of whom shall I be afraid?"</p>
+<p class="font-label-md text-label-md text-outline uppercase tracking-wider text-right">— Psalm 27:1</p>
+</div>
+</div>
+<!-- Testimony Content -->
+<div class="hidden space-y-md animate-in fade-in duration-500" id="content-testimony">
+<div class="p-md bg-primary-container/5 rounded-xl border border-primary-container/10">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed italic">
+                        "I wrote 'Echoes of Eternity' during a season of deep silence. I felt as though my prayers were drifting into an empty sky, but then I realized that God's silence isn't His absence. It's an invitation to listen deeper. This song is the sound of that discovery—that He is the anchor in the quiet."
+                    </p>
+<p class="font-label-md text-label-md text-primary mt-base font-bold text-right">— Selah Grace</p>
+</div>
+</div>
+</section>
+<!-- Social Actions Bar -->
+<section class="w-full max-w-[600px] flex justify-around items-center pt-md border-t border-outline-variant/30">
+<button class="flex flex-col items-center gap-1 group text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined group-hover:fill-icon">favorite</span>
+<span class="font-label-sm text-label-sm">24k</span>
+</button>
+<button class="flex flex-col items-center gap-1 group text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-sm text-label-sm">1.2k</span>
+</button>
+<button class="flex flex-col items-center gap-1 group text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">playlist_add</span>
+<span class="font-label-sm text-label-sm">Add</span>
+</button>
+<button class="flex flex-col items-center gap-1 group text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined">share</span>
+<span class="font-label-sm text-label-sm">Share</span>
+</button>
+</section>
+</main>
+<!-- Minimized Bottom Nav Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-safe px-4 bg-surface/60 backdrop-blur-xl shadow-[0px_-10px_30px_rgba(0,119,182,0.08)] rounded-t-xl z-50">
+<a class="flex flex-col items-center justify-center text-outline hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold" href="#">
+<span class="material-symbols-outlined fill-icon">library_music</span>
+<span class="font-label-sm text-label-sm">Library</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-sm text-label-sm">Upload</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-sm text-label-sm">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-outline hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+<script>
+        // Generate high-fidelity waveform bars
+        const waveformContainer = document.getElementById('waveform-container');
+        const barCount = 100;
+        let progressPercent = 40; 
+
+        function generateWaveform() {
+            waveformContainer.innerHTML = '';
+            for (let i = 0; i < barCount; i++) {
+                const bar = document.createElement('div');
+                const height = Math.random() * 80 + 20;
+                bar.className = 'waveform-segment';
+                bar.style.height = height + '%';
+                if (i < progressPercent) {
+                    bar.classList.add('active');
+                }
+                waveformContainer.appendChild(bar);
+            }
+        }
+
+        function seekWaveform(event) {
+            const rect = waveformContainer.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            progressPercent = Math.floor((x / rect.width) * barCount);
+            
+            const segments = waveformContainer.querySelectorAll('.waveform-segment');
+            segments.forEach((seg, idx) => {
+                if (idx < progressPercent) {
+                    seg.classList.add('active');
+                } else {
+                    seg.classList.remove('active');
+                }
+            });
+            
+            const totalSeconds = 255; 
+            const currentSeconds = Math.floor((progressPercent / barCount) * totalSeconds);
+            const m = Math.floor(currentSeconds / 60);
+            const s = (currentSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('current-time').innerText = `${m}:${s}`;
+        }
+
+        function togglePlay(btn) {
+            const icon = document.getElementById('play-pause-icon');
+            if (icon.innerText === 'pause') {
+                icon.innerText = 'play_arrow';
+            } else {
+                icon.innerText = 'pause';
+            }
+        }
+
+        function switchTab(tab) {
+            const tabs = ['lyrics', 'scripture', 'testimony'];
+            tabs.forEach(t => {
+                const tabBtn = document.getElementById(`tab-${t}`);
+                const content = document.getElementById(`content-${t}`);
+                if (t === tab) {
+                    tabBtn.classList.add('text-primary', 'border-primary', 'border-b-2');
+                    tabBtn.classList.remove('text-outline');
+                    content.classList.remove('hidden');
+                } else {
+                    tabBtn.classList.remove('text-primary', 'border-primary', 'border-b-2');
+                    tabBtn.classList.add('text-outline');
+                    content.classList.add('hidden');
+                }
+            });
+        }
+
+        // Initialize
+        generateWaveform();
+        window.addEventListener('resize', generateWaveform);
+    </script>
+
+
+</body></html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>TrinitySound - Playlist Detail</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-variant": "#e2e2e2",
+                      "on-surface": "#1a1c1c",
+                      "surface-bright": "#f9f9f9",
+                      "tertiary": "#515a5f",
+                      "surface-container-highest": "#e2e2e2",
+                      "tertiary-fixed-dim": "#bfc8ce",
+                      "surface-container-high": "#e8e8e8",
+                      "inverse-primary": "#94ccff",
+                      "on-secondary-fixed": "#241a00",
+                      "secondary-fixed-dim": "#e9c349",
+                      "error": "#ba1a1a",
+                      "inverse-surface": "#2f3131",
+                      "on-primary-container": "#f3f7ff",
+                      "on-primary": "#ffffff",
+                      "background": "#f9f9f9",
+                      "outline-variant": "#bfc7d1",
+                      "on-secondary-fixed-variant": "#574500",
+                      "primary-container": "#0077b6",
+                      "surface": "#f9f9f9",
+                      "on-tertiary-fixed": "#151d22",
+                      "primary-fixed": "#cde5ff",
+                      "on-surface-variant": "#404850",
+                      "surface-tint": "#006399",
+                      "inverse-on-surface": "#f0f1f1",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-container": "#745c00",
+                      "on-error": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "surface-dim": "#dadada",
+                      "on-tertiary-container": "#f0f8ff",
+                      "on-tertiary": "#ffffff",
+                      "primary-fixed-dim": "#94ccff",
+                      "on-background": "#1a1c1c",
+                      "tertiary-container": "#6a7278",
+                      "tertiary-fixed": "#dbe4ea",
+                      "secondary-fixed": "#ffe088",
+                      "secondary-container": "#fed65b",
+                      "surface-container-low": "#f3f3f4",
+                      "on-primary-fixed-variant": "#004b74",
+                      "outline": "#707881",
+                      "on-tertiary-fixed-variant": "#40484d",
+                      "surface-container": "#eeeeee",
+                      "secondary": "#735c00",
+                      "error-container": "#ffdad6",
+                      "primary": "#005d90",
+                      "on-primary-fixed": "#001d32"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "24px",
+                      "base": "8px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "lg": "48px",
+                      "margin-desktop": "64px",
+                      "xs": "4px",
+                      "xl": "80px",
+                      "sm": "12px",
+                      "max-width": "1440px"
+              },
+              "fontFamily": {
+                      "display-lg-mobile": ["Playfair Display"],
+                      "headline-md": ["Playfair Display"],
+                      "label-sm": ["Geist"],
+                      "body-lg": ["Geist"],
+                      "body-sm": ["Geist"],
+                      "body-md": ["Geist"],
+                      "headline-sm": ["Playfair Display"],
+                      "label-md": ["Geist"],
+                      "display-lg": ["Playfair Display"]
+              },
+              "fontSize": {
+                      "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "label-sm": ["10px", {"lineHeight": "14px", "fontWeight": "500"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-surface {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+        .glow-shadow {
+            box-shadow: 0px 10px 30px rgba(0, 119, 182, 0.08);
+        }
+        .gold-glow {
+            box-shadow: 0px 4px 20px rgba(212, 175, 55, 0.15);
+        }
+        .scroll-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scroll-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 glass-surface glow-shadow h-16 flex justify-between items-center px-margin-mobile md:px-margin-desktop">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary cursor-pointer" data-icon="arrow_back">arrow_back</span>
+<h1 class="font-headline-sm text-headline-sm text-primary italic">TRINITY<i class="italic">Sound</i></h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary transition-colors" data-icon="search">search</span>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-primary-fixed">
+<img alt="User" class="w-full h-full object-cover" data-alt="A professional portrait of a young man with a serene expression, set against a soft-focus studio background. The lighting is bright and airy, reflecting a clean, light-mode design aesthetic. His features are clear, and the overall mood is peaceful and professional, fitting for a modern spiritual music platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4ZrQkRL_H4H1MyxuBZtIw21z5ovarlO3y0ObTJKEVpCa2IEWjeFSDhjI7AHWdGkOVKtJ-DvyLzXg6Z8FxGemPjj2b17r0FwbNtRffIp_dCRd3ev_RzIcnUEfx33XGK5pKUj91m6vwmAfnCdslxTJ47OBefL2KDD8SDxeXLKQWWGPmNjlFhqu2OSVBSnUONCCWkFGAjW7_gN7I4whwPPkMrpLzS1Zhtc4sJxXQQEBA3gTysOrXTUez7YSu6oJFVn_IYVtaD9qjQ4C_">
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-[1440px] mx-auto pt-24 px-margin-mobile md:px-margin-desktop">
+<!-- Hero Section: Bento Style -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-xl">
+<!-- Playlist Cover -->
+<div class="md:col-span-5 aspect-square rounded-xl overflow-hidden glow-shadow group relative">
+<img alt="Morning Worship Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A breathtaking landscape of a mountain range at sunrise, with soft golden light filtering through a misty morning atmosphere. The colors are ethereal sky blues and warm golds, evoking a sense of transcendence and spiritual peace. The composition is clean and minimalist, serving as high-end digital cover art for a worship music playlist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLWIY3X-3OMnU91KELOoXU7YXocvBZpadVXNYC3sTrYEMzaNnGSgq_ScXS4a3iMvr-1I08-JvCXUPun8b0e4rkQKKH_bSxbruojKXikoSUGQYJnkND3WF8GTObrWi4OIBtctZU5zvF9628HRennNNUYAr88pHFIsvAkLWqwttyyO1yW7LstcLM07fKBDrsidKidkeln4NWYLF3X_ivxeRu4uJy1KlbjXkssIFgRG-TzrkQy6nos5Xh7Gie9KI4f8qD1TrJOzyCQeMS">
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-md">
+<button class="w-14 h-14 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center gold-glow hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+</div>
+<!-- Playlist Info & Actions -->
+<div class="md:col-span-7 flex flex-col justify-end space-y-6">
+<div>
+<div class="flex items-center gap-2 mb-2">
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full font-label-md text-label-md">Morning Worship</span>
+<span class="text-outline font-label-md text-label-md">• Public Playlist</span>
+</div>
+<h2 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-2">Morning Worship</h2>
+<div class="flex items-center gap-3">
+<img alt="Creator" class="w-6 h-6 rounded-full" data-alt="A close-up portrait of a woman with a kind and joyful expression, styled in a minimalist and clean aesthetic. The lighting is soft and natural, emphasizing a bright, airy feel. The background is a simple, high-key white, perfectly aligning with the 'Divine Light' design language of the interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvEo_2S19EqFGhRj10gWUOxvSi0wxlQfivM99i38rLxdKc5EIYGGRUFNmN5-gZ9U0PGcqm7jN2kPL2_WZUzjSRS7tcUlbL6So3Zidb4B3Dtmv51XE655MOFkoc-v8YFqYHIjfe_DZG-Ev2A5rdsfbPaKzIoKQc4I1vKyKY44_Xn9QwgIfu3AUZ1SziGD6qWo3XZ6_d4JMOgObp9mkld0KI1WugchQD8yCXuzSwah_g0q8CTeTDV20u5XrOelMH8M55rqW3K4Y-2d9X">
+<p class="font-body-md text-on-surface-variant">Created by <span class="font-bold text-primary">Grace Temple</span> • 12,450 followers</p>
+</div>
+</div>
+<!-- Rating and Collaboration -->
+<div class="flex flex-wrap items-center gap-6 py-4 border-y border-surface-variant">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary-fixed-dim" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-bold text-on-surface">4.8</span>
+<span class="text-outline text-body-sm">(1.2k ratings)</span>
+</div>
+<div class="h-4 w-px bg-surface-variant hidden md:block"></div>
+<div class="flex items-center gap-3">
+<span class="text-body-sm text-on-surface-variant font-medium">Collab Mode</span>
+<button class="w-12 h-6 bg-outline-variant rounded-full relative transition-colors duration-300" onclick="this.classList.toggle('bg-primary-container'); this.classList.toggle('bg-outline-variant')">
+<span class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 transform" id="toggle-circle"></span>
+</button>
+<script>
+                            const btn = document.querySelector('button[onclick]');
+                            btn.addEventListener('click', () => {
+                                const circle = btn.querySelector('#toggle-circle');
+                                circle.classList.toggle('translate-x-6');
+                            });
+                        </script>
+</div>
+</div>
+<!-- Primary CTA Row -->
+<div class="flex items-center gap-4">
+<button class="px-8 py-3 bg-secondary-container text-on-secondary-container rounded-full font-label-md text-label-md flex items-center gap-2 gold-glow hover:opacity-90 transition-all">
+<span class="material-symbols-outlined" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                        Follow
+                    </button>
+<button class="p-3 border border-outline-variant text-outline rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+<button class="p-3 border border-outline-variant text-outline rounded-full hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Song List Section -->
+<section class="mb-xl">
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-sm text-headline-sm">Songs <span class="text-outline text-body-lg font-normal ml-2">24 tracks</span></h3>
+<div class="flex items-center gap-2 text-primary font-label-md">
+<span class="material-symbols-outlined" data-icon="sort">sort</span>
+                    Sort by Date Added
+                </div>
+</div>
+<!-- Table Header -->
+<div class="hidden md:grid grid-cols-12 gap-4 px-4 py-2 border-b border-surface-variant text-outline font-label-md uppercase tracking-wider">
+<div class="col-span-1">#</div>
+<div class="col-span-6">Title</div>
+<div class="col-span-3">Album</div>
+<div class="col-span-2 text-right">Duration</div>
+</div>
+<!-- Song Items -->
+<div class="space-y-1 mt-2">
+<!-- Song 1 -->
+<div class="grid grid-cols-12 gap-4 items-center p-4 rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="col-span-1 text-outline font-label-md group-hover:hidden">1</div>
+<div class="col-span-1 text-primary hidden group-hover:block">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="col-span-9 md:col-span-6 flex items-center gap-4">
+<img alt="Track 1" class="w-10 h-10 rounded-lg" data-alt="Digital art of a vibrant galaxy with swirling nebulae in deep blues and celestial golds. The artwork is polished and high-definition, representing a music album cover with a spiritual or cosmic theme, fitting into the 'Divine Light' aesthetic with its radiant, glowing core." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8OUQtPq3R2WfGIhf_wNGPo4WjG8A1QPyXW0m_SvoZVnILlDY51YgaX2coNoyKUsJzWaHPI0IE6Q-KT7aRDxT5T8wsG5ILasmsTS67dxZs6rcKBQ8WBvl-YZmBN5aFL5Nyd2re--JncAroOU7dWjS5ZqTAV0A13tz39dYNYzt7LbVCFo7G5N-dmMSrI-Sw3Nra-A4yOzshhLNexo76Xkug1f-kifIXcO14X4u7URlpcl3lzb-hByuhVsS42NHdKXaC1hN0BxAXjuzG">
+<div>
+<h4 class="font-body-md font-semibold text-on-surface">Holy Spirit Rain Down</h4>
+<p class="text-body-sm text-outline">Hillsong Worship</p>
+</div>
+</div>
+<div class="hidden md:block md:col-span-3 text-body-sm text-on-surface-variant">Best of Hillsong</div>
+<div class="col-span-2 text-right flex items-center justify-end gap-4">
+<span class="material-symbols-outlined text-outline opacity-0 group-hover:opacity-100 transition-opacity" data-icon="favorite">favorite</span>
+<span class="text-body-sm text-outline">5:42</span>
+</div>
+</div>
+<!-- Song 2 -->
+<div class="grid grid-cols-12 gap-4 items-center p-4 rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer bg-primary-container/5">
+<div class="col-span-1 text-primary">
+<div class="flex items-end gap-[2px] h-3">
+<div class="w-[2px] bg-primary animate-[bounce_1s_infinite_0.1s] h-full"></div>
+<div class="w-[2px] bg-primary animate-[bounce_1s_infinite_0.3s] h-2/3"></div>
+<div class="w-[2px] bg-primary animate-[bounce_1s_infinite_0.5s] h-1/2"></div>
+</div>
+</div>
+<div class="col-span-9 md:col-span-6 flex items-center gap-4">
+<img alt="Track 2" class="w-10 h-10 rounded-lg" data-alt="A minimalist photograph of a single white lily in focus against a soft, out-of-focus azure background. The lighting is high-key and bright, creating a sense of purity and serenity. The overall visual style is elegant and clean, serving as a tranquil album cover for acoustic worship music." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBiMxZob3pUK8SdnldWMYt78qmhcirs4HyKa4RYmJeM0qgEBop19R01NiGJN0CfA4nWV5jynJEdSxztNL_g7laZ_YXyba3YF0puXYYWHrpNg6MCepodal-zsEWfvp8oXe5d6ebohx_batoxBWO4dfBA2al1z6ZDrUmbqedhr0guAU3gvL7zitj5dTjtp6FLWv4nAZT4WDTWwrmeCYu4ObxKOcJSw9eEJj2NflF8VFwqxU1vq8vYZBYY519CxT1zKenGHz6Xuz3hY_76">
+<div>
+<h4 class="font-body-md font-semibold text-primary">Gratitude</h4>
+<p class="text-body-sm text-outline">Brandon Lake</p>
+</div>
+</div>
+<div class="hidden md:block md:col-span-3 text-body-sm text-on-surface-variant">House of Miracles</div>
+<div class="col-span-2 text-right flex items-center justify-end gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="text-body-sm text-outline">4:15</span>
+</div>
+</div>
+<!-- Song 3 -->
+<div class="grid grid-cols-12 gap-4 items-center p-4 rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="col-span-1 text-outline font-label-md group-hover:hidden">3</div>
+<div class="col-span-1 text-primary hidden group-hover:block">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="col-span-9 md:col-span-6 flex items-center gap-4">
+<img alt="Track 3" class="w-10 h-10 rounded-lg" data-alt="A high-quality digital illustration of a dove in flight, rendered with soft, painterly strokes and a glowing aura. The color palette features whites, creams, and pale sky blues. The lighting is ethereal and angelic, capturing a moment of transcendence and peace for a spiritual music track cover." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4MIXqX_mMkGazAW4gh7ukUlPy3t2MYvaP6bpXHvBINtZrDjemrwzw8bfTO7bUfj2UiPBuP6Y8-YipP0p4Nz3WXlqdJ7kG48CQdqY3-BMIHGNqd4qmyLIGtdXg3_-Qgg2xKOGRnAsVKoC3NJYVKKXkGLrCQeilnYay9HfbniiyeXdQfpwHv_GQEaPJ7liziw7aREJ9qpAfaU4gl6XOLq5OUavoOsor9Yuap1vvMEfrto3mwRrHDHzIT9KJ6tX4UMVVRJwQS469HbRw">
+<div>
+<h4 class="font-body-md font-semibold text-on-surface">Promises</h4>
+<p class="text-body-sm text-outline">Maverick City Music</p>
+</div>
+</div>
+<div class="hidden md:block md:col-span-3 text-body-sm text-on-surface-variant">Maverick City Vol. 3</div>
+<div class="col-span-2 text-right flex items-center justify-end gap-4">
+<span class="material-symbols-outlined text-outline opacity-0 group-hover:opacity-100 transition-opacity" data-icon="favorite">favorite</span>
+<span class="text-body-sm text-outline">6:20</span>
+</div>
+</div>
+<!-- Song 4 -->
+<div class="grid grid-cols-12 gap-4 items-center p-4 rounded-xl hover:bg-surface-container-low transition-colors group cursor-pointer">
+<div class="col-span-1 text-outline font-label-md group-hover:hidden">4</div>
+<div class="col-span-1 text-primary hidden group-hover:block">
+<span class="material-symbols-outlined" data-icon="play_arrow" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+<div class="col-span-9 md:col-span-6 flex items-center gap-4">
+<img alt="Track 4" class="w-10 h-10 rounded-lg" data-alt="An abstract landscape depicting a calm ocean at twilight with a bright, full moon reflecting on the water. The palette is dominated by serene blues and shimmering silver highlights. The atmosphere is quiet and reflective, designed as a peaceful album cover for meditation or prayerful worship music." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbEmBKJeK46lBhmynuhtNOCcU71k4zhTZ4faKK7zVSdawmkC0Fjfqy52bsP5gcK9wzbEFqQwwVHAyL_iFUz1F8HMFcoVJN7rEXYmINHx9d-vc2IvUrENZG5Ag2Zif8LFI0r9MhsK9Dgy9UVkb0aG5PZ5ed-afTHqY5e7uzMAaFROrBmQggr11DGrJyUocqucEdQEmrK--THtB9Va-8itxZYxl1g9oRaDlhVRCntgEHv2uN3ww2Kz_COc3O-2Q5C1yfdijA5BRTFIzG">
+<div>
+<h4 class="font-body-md font-semibold text-on-surface">Living Hope</h4>
+<p class="text-body-sm text-outline">Phil Wickham</p>
+</div>
+</div>
+<div class="hidden md:block md:col-span-3 text-body-sm text-on-surface-variant">Living Hope LP</div>
+<div class="col-span-2 text-right flex items-center justify-end gap-4">
+<span class="material-symbols-outlined text-outline opacity-0 group-hover:opacity-100 transition-opacity" data-icon="favorite">favorite</span>
+<span class="text-body-sm text-outline">5:08</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Suggested For You (Horizontal Scroll) -->
+<section class="mb-xl">
+<h3 class="font-headline-sm text-headline-sm mb-md">More Like This</h3>
+<div class="flex overflow-x-auto gap-gutter pb-4 scroll-hide">
+<!-- Suggestion 1 -->
+<div class="min-w-[200px] group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden glow-shadow mb-3">
+<img alt="Related 1" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A cinematic photo of a cathedral's vaulted ceiling with stained glass windows casting colorful, soft light onto the stone pillars. The aesthetic is grand yet serene, utilizing a bright, airy light-mode feel with vibrant jewel tones. It's a high-end playlist cover suggestion for classic choral worship." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHMvbMMd7oP8byLiWDvEGAZiCnZgy8YDySZCV8jeK1VauWebzpatl_aqA3skAlsWLbCKivtCcrH3qLoR7NyjVNGFs20f_8weXSEshcKfYMtS_nh_LSYlshpxaHqKNJbNnR9hwqwTTsFT02C4_uC2kLyT4fAcNa_6WcNWoqjfTTmHOYZwdJY581aS5jOh7ZWJ9jbQohFISBogwxpDUyTR20n51cnDqoPUiTkcbzlMDle1Oc97KhX_D1zk5dmZcbZQERSFFzvfz7hvuy">
+</div>
+<h5 class="font-body-md font-semibold text-on-surface">Vesper Choirs</h5>
+<p class="text-body-sm text-outline">Traditional &amp; Choral</p>
+</div>
+<!-- Suggestion 2 -->
+<div class="min-w-[200px] group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden glow-shadow mb-3">
+<img alt="Related 2" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A minimalist digital illustration of a sunrise over a calm lake, with stylized rays of light in shades of gold and soft orange. The design is clean, geometric, and modern, using a light and airy background. It represents a 'New Beginnings' worship playlist, evoking hope and spiritual renewal." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD12XXojGf19BxyTTcWqjiOQBM5Ge8Djhm-nGs888L3FvvtamI7WLJfzDTExyKzqxAW40d-F4xJGykEB2j5MZRAJzUfdD7pBRkPjEkZH4as1iAjyi2mWKTNSRgatXhGY6A-AHSqw2gqpsC4XwPmeLyjHyhLqNU3RIKy9G0QoMpWRlg0fd5W5X0vMJSY1T776-TEMvmYnmGbtljTvIDlxE5QMIiKAKfItYkd9ImgWltt7zkCRAIHguNFK96wDTyqdLfIz9oBTfGOhXrV">
+</div>
+<h5 class="font-body-md font-semibold text-on-surface">Joyful Noise</h5>
+<p class="text-body-sm text-outline">Contemporary Praise</p>
+</div>
+<!-- Suggestion 3 -->
+<div class="min-w-[200px] group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden glow-shadow mb-3">
+<img alt="Related 3" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="An ethereal close-up of a field of wheat swaying in the golden hour light, with soft bokeh effects creating a dreamy atmosphere. The color palette is warm golds and earthy browns against a pale sky. This image serves as a high-end cover for a soulful, folk-inspired worship playlist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArqy47EEtiT9bbTYWXZ0tRdcv87VXY5NGmRm-8bfW2GdOyDuItwwtvUTSTbOAA1RuymIMoeUNvcdYKTaKvJzXbWBkVsTCgihGJccrlweYF8tprLgSQyoZRVgtjwLOKdFMdOOyF4UxAYmKvtgSEFw9IEh7UjYX3BN_WdqxTCbZ5f0AsZxrHTF-fMm-cs1QdspIDQA23_nug3fcCeY825Lr6qgoFg0k6jr1F2_I55eJGoLPadzaYCc4NDMY0SuX4MPG_RA8Gor6klNWO">
+</div>
+<h5 class="font-body-md font-semibold text-on-surface">Soulful Spirit</h5>
+<p class="text-body-sm text-outline">Acoustic &amp; Folk</p>
+</div>
+<!-- Suggestion 4 -->
+<div class="min-w-[200px] group cursor-pointer">
+<div class="aspect-square rounded-xl overflow-hidden glow-shadow mb-3">
+<img alt="Related 4" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A beautiful macro shot of a single dewdrop on a leaf, reflecting a miniature world of bright greens and blues. The lighting is crisp and natural, highlighting themes of clarity and new life. The overall aesthetic is minimalist and high-definition, perfect for a contemplative prayer playlist." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5E-DLo3yIGVqxWHUA-jv2v2KC9f4t0PrOkbsQLf0IXh6tyHr4EA6EJDsFnJtFKVw1VD9ANFkFYKZaS4mcQkNz3ERNKC3k5x8J_alnKQSd6qNKThIUVQwW6k73rqppZ292k2vhSFcuoJDX_PviRmnNGTCM9BQ8D-HCtb1Os0aoKbJI5RDsr2dFrZLNOMjT3fdAqLtQNDGTSupV_98jwZo5chzbe-MGwJ98R7Aj_hIJ9H6ykEo2sg95pL8v04h6CyCXF6CA6tu3P2F0">
+</div>
+<h5 class="font-body-md font-semibold text-on-surface">Deep Devotion</h5>
+<p class="text-body-sm text-outline">Ambient Prayer</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Player Bar (Persistent) -->
+<footer class="fixed bottom-0 w-full z-50 glass-surface glow-shadow border-t border-white/20 h-24 flex items-center px-margin-mobile md:px-margin-desktop">
+<div class="max-w-[1440px] w-full mx-auto grid grid-cols-2 md:grid-cols-3 items-center">
+<!-- Now Playing Info -->
+<div class="flex items-center gap-4">
+<img alt="Currently Playing" class="w-12 h-12 rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHOsTOrjIJKuOBOk98T41e7D4bzOnXApVrsflgzpDta-uG74AXJevWxMMyWFwJP3W6ZxocCRx9eKzO50JKJSrDUdXxhMBHG5GIg753w06F-DjO28dS5d9gTmy45RQauQx6M6NzQEez1u4WDM-Fv7lQpyP_2GqJxADGBPaIU2i9DIv9VsR6U87sruH66tIyIDd7wgJbLqfC4W37-5xMJ8Qj4JhY8DATuqR8ibuZi2bfWNM2nKwzcY9ClPW6rfiO1qA9sXeZNxs6GkHE">
+<div class="truncate">
+<h6 class="font-body-md font-bold text-on-surface truncate">Gratitude</h6>
+<p class="text-body-sm italic font-display-lg text-outline">Brandon Lake</p>
+</div>
+<span class="material-symbols-outlined text-primary cursor-pointer" data-icon="favorite" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<!-- Controls (Centered on Desktop) -->
+<div class="hidden md:flex flex-col items-center gap-2">
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary" data-icon="shuffle">shuffle</span>
+<span class="material-symbols-outlined text-on-surface cursor-pointer text-3xl" data-icon="skip_previous" style="font-variation-settings: 'FILL' 1;">skip_previous</span>
+<button class="w-12 h-12 bg-primary text-on-primary rounded-full flex items-center justify-center glow-shadow hover:scale-105 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="pause" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+<span class="material-symbols-outlined text-on-surface cursor-pointer text-3xl" data-icon="skip_next" style="font-variation-settings: 'FILL' 1;">skip_next</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hover:text-primary" data-icon="repeat">repeat</span>
+</div>
+<div class="w-full flex items-center gap-3">
+<span class="text-label-sm text-outline">2:45</span>
+<div class="flex-1 h-1 bg-surface-variant rounded-full relative overflow-hidden group">
+<div class="absolute inset-y-0 left-0 w-[60%] bg-primary"></div>
+</div>
+<span class="text-label-sm text-outline">4:15</span>
+</div>
+</div>
+<!-- Extra Controls -->
+<div class="flex justify-end items-center gap-4">
+<span class="material-symbols-outlined text-outline cursor-pointer hidden md:block" data-icon="lyrics">lyrics</span>
+<span class="material-symbols-outlined text-outline cursor-pointer hidden md:block" data-icon="queue_music">queue_music</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline cursor-pointer" data-icon="volume_up">volume_up</span>
+<div class="w-24 h-1 bg-surface-variant rounded-full hidden md:block overflow-hidden">
+<div class="h-full w-[75%] bg-primary"></div>
+</div>
+</div>
+<button class="md:hidden w-10 h-10 bg-primary text-on-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="pause" style="font-variation-settings: 'FILL' 1;">pause</span>
+</button>
+</div>
+</div>
+</footer>
+<!-- Bottom Navigation Bar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full glass-surface flex justify-around items-center pt-2 pb-safe px-4 z-50 rounded-t-xl glow-shadow" style="padding-bottom: env(safe-area-inset-bottom);">
+<div class="flex flex-col items-center justify-center text-outline dark:text-outline-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold font-label-sm text-label-sm">
+<span class="material-symbols-outlined" data-icon="library_music" style="font-variation-settings: 'FILL' 1;">library_music</span>
+<span class="">Library</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline dark:text-outline-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="">Upload</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline dark:text-outline-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="">Search</span>
+</div>
+<div class="flex flex-col items-center justify-center text-outline dark:text-outline-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="">Profile</span>
+</div>
+</nav>
+<!-- Floating Action Button (Contextual: Only for main interaction) -->
+<!-- Suppressed on detail pages per rules -->
+
+
+</body></html>
