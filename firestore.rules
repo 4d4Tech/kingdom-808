@@ -2,22 +2,22 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /tracks/{trackId} {
-      allow read: if true;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, write: if true;
     }
     match /users/{userId} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if true;
     }
     match /users/{userId}/feed/{feedItem} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow write: if false; // Only written by Cloud Functions
+      allow read, write: if true;
+    }
+    match /users/{userId}/listening_history/{historyId} {
+      allow read, write: if true;
+    }
+    match /users/{userId}/followed_playlists/{playlistId} {
+      allow read, write: if true;
     }
     match /playlists/{playlistId} {
-      allow read: if true;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read, write: if true;
     }
   }
 }

@@ -11,7 +11,10 @@ import Wrapped from './pages/Wrapped';
 import FullScreenPlayer from './pages/FullScreenPlayer';
 
 function App() {
-  const [currentView, setCurrentView] = useState('artist');
+  const [currentView, setCurrentView] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('view') || 'artist';
+  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const renderView = () => {
