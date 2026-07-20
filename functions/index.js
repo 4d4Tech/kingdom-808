@@ -1,5 +1,5 @@
 const { onObjectFinalized } = require("firebase-functions/v2/storage");
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated, onDocumentDeleted } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onCall, HttpsError } = require("firebase-functions/v2/https");
 const { getStorage } = require("firebase-admin/storage");
@@ -147,4 +147,48 @@ exports.aggregateBillboardCharts = onSchedule("every sunday 00:00", async () => 
 
   await batch.commit();
   logger.log("Billboard charts aggregated successfully.");
+});
+
+/**
+ * Phase 3: Cleanup Storage Files on Track Deletion
+ */
+exports.onTrackDelete = onDocumentDeleted("tracks/{trackId}", async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const trackData = snap.data();
+  const audioUrl = trackData.audioUrl;
+  const artworkUrl = trackData.artworkUrl;
+
+  const bucket = getStorage().bucket();
+
+  // Helper to extract storage path from download URL
+  const getPathFromUrl = (url) => {
+    if (!url) return null;
+    const match = url.match(/\/o\/(.+?)\?/);
+    if (match && match[1]) {
+      return decodeURIComponent(match[1]);
+    }
+    return null;
+  };
+
+  try {
+    if (audioUrl) {
+      const audioPath = getPathFromUrl(audioUrl);
+      if (audioPath) {
+        await bucket.file(audioPath).delete();
+        logger.log(`Deleted audio file from storage: ${audioPath}`);
+      }
+    }
+    
+    if (artworkUrl && artworkUrl.includes('/images/artists/')) {
+      const artworkPath = getPathFromUrl(artworkUrl);
+      if (artworkPath) {
+        await bucket.file(artworkPath).delete();
+        logger.log(`Deleted artwork file from storage: ${artworkPath}`);
+      }
+    }
+  } catch (err) {
+    logger.error(`Error deleting files for track ${event.params.trackId}:`, err);
+  }
 });

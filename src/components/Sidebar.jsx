@@ -21,6 +21,10 @@ const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen }) => {
           <span className={`material-symbols-outlined ${currentView === 'artist' ? 'fill-icon' : ''}`}>person</span>
           Artist Profile
         </button>
+        <button className={`sidebar-item ${currentView === 'dashboard' ? 'active' : ''}`} onClick={() => setCurrentView('dashboard')}>
+          <span className={`material-symbols-outlined ${currentView === 'dashboard' ? 'fill-icon' : ''}`}>dashboard</span>
+          Artist Dashboard
+        </button>
         <button className={`sidebar-item ${currentView === 'discover' ? 'active' : ''}`} onClick={() => setCurrentView('discover')}>
           <span className={`material-symbols-outlined ${currentView === 'discover' ? 'fill-icon' : ''}`}>explore</span>
           Discovery

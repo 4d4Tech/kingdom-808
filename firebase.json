@@ -5,6 +5,12 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "auth": {
+    "providers": {
+      "anonymous": true,
+      "emailPassword": true
+    }
+  },
   "hosting": {
     "public": "dist",
     "ignore": [

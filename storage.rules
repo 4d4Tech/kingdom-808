@@ -16,5 +16,15 @@ service firebase.storage {
       allow read: if true;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
+    
+    // New SoundCloud-style Artist Upload Paths
+    match /audio/artists/{artistId}/tracks/{fileName} {
+      allow write: if request.auth != null && request.auth.uid == artistId;
+      allow read: if true; 
+    }
+    match /images/artists/{artistId}/artwork/{fileName} {
+      allow write: if request.auth != null && request.auth.uid == artistId;
+      allow read: if true;
+    }
   }
 }
