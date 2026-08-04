@@ -86,25 +86,26 @@ function App() {
       return;
     }
 
-    // Email / Registered Artist profile subscription
+    // Registered profile subscription (Listener or Artist)
     const userDocRef = doc(db, 'users', user.uid);
     const unsubscribeProfile = onSnapshot(userDocRef, (snap) => {
       if (snap.exists()) {
         const data = snap.data();
+        const isArtistRole = isBrandon || data.role === 'artist' || data.isArtist === true;
         setUserProfile({ 
           ...data, 
           email: user.email || data.email,
-          isArtist: true, 
+          isArtist: isArtistRole, 
           isAnonymous: false 
         });
       } else {
         setUserProfile(parsedLocal || { 
-          displayName: user.displayName || (isBrandon ? 'Brandon Robinson' : user.email) || 'Artist', 
+          displayName: user.displayName || (isBrandon ? 'Brandon Robinson' : user.email) || 'User', 
           email: user.email,
-          tagline: 'Modern Worship & Ethereal Melodies',
+          tagline: isBrandon ? 'Modern Worship & Ethereal Melodies' : 'Music Enthusiast & Worship Listener',
           avatarUrl: 'https://i.pravatar.cc/300?img=11',
-          isArtist: true,
-          role: 'artist',
+          isArtist: isBrandon,
+          role: isBrandon ? 'artist' : 'listener',
           isAnonymous: false 
         });
       }
@@ -125,10 +126,15 @@ function App() {
     }
   };
 
+  const handleRequireListenerAuth = (msg) => {
+    setAuthModalPrompt(msg || "Sign in to your Listener Account to save favorites, build custom playlists, and follow artists");
+    setIsAuthModalOpen(true);
+  };
+
   const renderView = () => {
     switch (currentView) {
       case 'discover': return <Discover />;
-      case 'playlist': return <PlaylistDetail />;
+      case 'playlist': return <PlaylistDetail user={user} onRequireAuth={handleRequireListenerAuth} />;
       case 'wrapped': return <Wrapped />;
       case 'player': return <FullScreenPlayer setCurrentView={handleNavigate} />;
       case 'artist': return <ArtistProfile userProfile={userProfile} onOpenSettings={() => setIsProfileSettingsOpen(true)} />;
@@ -207,6 +213,10 @@ function App() {
             setAuthModalPrompt("Sign in or register as an Artist to upload tracks and manage your catalog");
             setIsAuthModalOpen(true);
           }}
+          onOpenListenerAuth={() => {
+            setAuthModalPrompt("Sign in to your Listener Account to save favorites, build playlists, and follow artists");
+            setIsAuthModalOpen(true);
+          }}
         />
 
         {/* Main Content Area */}
@@ -215,13 +225,14 @@ function App() {
           {/* Top Header (Visible except on fullscreen) */}
           {!isFullScreenPlayer && (
             <header className="top-header">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <button 
                   className="icon-btn mobile-only" 
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsMobileMenuOpen(!isMobileMenuOpen);
                   }}
+                  aria-label="Open Navigation Menu"
                 >
                   <span className="material-symbols-outlined">menu</span>
                 </button>
@@ -231,9 +242,25 @@ function App() {
                 </div>
               </div>
 
-              <div className="flex gap-4 items-center right-actions" onClick={(e) => e.stopPropagation()}>
-                <button className="icon-btn"><span className="material-symbols-outlined">notifications</span></button>
-                <button className="icon-btn"><span className="material-symbols-outlined">favorite_border</span></button>
+              <div className="flex gap-3 items-center right-actions" onClick={(e) => e.stopPropagation()}>
+                {/* Prominent Listener Sign In / Sign Up Button visible on Mobile & Desktop */}
+                {user?.isAnonymous && (
+                  <button 
+                    type="button"
+                    className="btn btn-pill btn-primary btn-xs font-bold flex items-center gap-1"
+                    onClick={() => {
+                      setAuthModalPrompt("Sign in to your Listener Account to save favorites, build playlists, and follow artists");
+                      setIsAuthModalOpen(true);
+                    }}
+                    style={{ padding: '6px 14px', fontSize: '12px', whiteSpace: 'nowrap' }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>login</span>
+                    Sign In / Sign Up
+                  </button>
+                )}
+
+                <button className="icon-btn hidden-mobile"><span className="material-symbols-outlined">notifications</span></button>
+                <button className="icon-btn hidden-mobile"><span className="material-symbols-outlined">favorite_border</span></button>
                 
                 <div className="profile-chip-container" style={{ position: 'relative' }}>
                   <div className="profile-chip" onClick={() => setShowProfileMenu(!showProfileMenu)}>

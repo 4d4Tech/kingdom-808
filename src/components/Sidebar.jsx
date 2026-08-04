@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen, onOpenSettings, user, userProfile, onOpenArtistAuth }) => {
+const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen, onOpenSettings, user, userProfile, onOpenArtistAuth, onOpenListenerAuth }) => {
   // Explicit case-insensitive evaluation for registered artist check
   const userEmail = (user?.email || userProfile?.email || '').toLowerCase();
   const isRegisteredArtist = Boolean(
@@ -9,6 +9,8 @@ const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen, onOpenSettings
     userProfile?.isArtist || 
     userProfile?.role === 'artist'
   );
+
+  const isGuest = !user || user.isAnonymous;
 
   return (
     <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
@@ -19,11 +21,34 @@ const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen, onOpenSettings
           DIVINE HARMONY
         </div>
       </div>
+
+      {/* Prominent Listener Sign In / Sign Up Button for Guests */}
+      {isGuest && (
+        <div className="px-3 mb-4">
+          <button 
+            type="button" 
+            className="btn btn-pill btn-primary btn-xs w-full text-center flex items-center justify-center gap-2"
+            onClick={onOpenListenerAuth || onOpenArtistAuth}
+            style={{ padding: '10px 16px', fontWeight: 'bold', fontSize: '12px' }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>account_circle</span>
+            Sign In / Sign Up
+          </button>
+        </div>
+      )}
       
       {/* Primary Navigation (Apple Music / Spotify Parity) */}
       <nav className="sidebar-nav">
-        <div className="px-4 mb-1 text-xs font-bold text-outline uppercase tracking-wider">
-          Listen
+        <div className="px-4 mb-1 text-xs font-bold text-outline uppercase tracking-wider flex justify-between items-center">
+          <span>Listen</span>
+          {isGuest && (
+            <span 
+              className="text-primary text-xs font-bold cursor-pointer underline hover:opacity-80"
+              onClick={onOpenListenerAuth || onOpenArtistAuth}
+            >
+              Sign In
+            </span>
+          )}
         </div>
 
         <button 

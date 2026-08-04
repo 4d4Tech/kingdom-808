@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db, auth, analytics } from '../firebase';
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, increment, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, increment, collection, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { logEvent } from 'firebase/analytics';
 import { useAudio } from '../context/AudioProvider';
 
-const PlaylistDetail = () => {
+const PlaylistDetail = ({ user, onRequireAuth }) => {
   const { isPlaying, currentTrack, playTrack } = useAudio();
 
   const playlistId = 'morning_worship';
@@ -13,6 +13,9 @@ const PlaylistDetail = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [hoveredTrack, setHoveredTrack] = useState(null);
+  const [uploadedTracks, setUploadedTracks] = useState([]);
+
+  const isGuest = !user || user.isAnonymous;
 
   const [likedTracks, setLikedTracks] = useState(() => {
     try {
@@ -23,7 +26,39 @@ const PlaylistDetail = () => {
     }
   });
 
+  // Fetch uploaded tracks from Firestore
+  useEffect(() => {
+    const tracksRef = collection(db, 'tracks');
+    const unsubscribe = onSnapshot(tracksRef, (snapshot) => {
+      let trackList = snapshot.docs.map((d, index) => {
+        const data = d.data();
+        return {
+          id: d.id,
+          num: String(index + 1).padStart(2, '0'),
+          title: data.title,
+          artist: data.artist || data.artistName || 'Brandon Robinson',
+          album: data.genre || 'Single',
+          date: 'Just Now',
+          time: '3:45',
+          img: data.artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=100",
+          audioUrl: data.audioUrl,
+          isPublic: data.isPublic
+        };
+      }).filter(t => t.isPublic !== false);
+
+      setUploadedTracks(trackList);
+    }, (err) => {
+      console.error("Failed to fetch tracks in PlaylistDetail:", err);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const toggleTrackLike = (trackId) => {
+    if (isGuest) {
+      if (onRequireAuth) onRequireAuth("Sign in to save your favorite tracks and build custom playlists");
+      return;
+    }
     setLikedTracks(prev => {
       const updated = { ...prev, [trackId]: !prev[trackId] };
       localStorage.setItem('liked_tracks', JSON.stringify(updated));
@@ -131,6 +166,10 @@ const PlaylistDetail = () => {
 
   // Handle Follow Click
   const handleFollow = async () => {
+    if (isGuest) {
+      if (onRequireAuth) onRequireAuth("Sign in to follow playlists and save your custom music collection");
+      return;
+    }
     if (!userId) return;
 
     const nextFollowState = !isFollowing;
@@ -284,7 +323,7 @@ const PlaylistDetail = () => {
         </div>
 
         <div className="flex-col gap-2">
-          {tracks.map(track => {
+          {(uploadedTracks.length > 0 ? [...uploadedTracks, ...tracks] : tracks).map(track => {
             const isCurrent = currentTrack?.id === track.id;
             const isCurrentPlaying = isCurrent && isPlaying;
             const isHovered = hoveredTrack === track.num;

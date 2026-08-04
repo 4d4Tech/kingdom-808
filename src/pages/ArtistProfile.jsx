@@ -9,26 +9,29 @@ const ArtistProfile = ({ userProfile, onOpenSettings }) => {
   const { playTrack, currentTrack, isPlaying } = useAudio();
 
   useEffect(() => {
-    // Fetch tracks uploaded by user from Firestore
-    let q;
-    if (auth.currentUser) {
-      q = query(
-        collection(db, 'tracks'),
-        where('artistId', '==', auth.currentUser.uid),
-        orderBy('createdAt', 'desc')
-      );
-    } else {
-      q = query(
-        collection(db, 'tracks'),
-        orderBy('createdAt', 'desc')
-      );
-    }
+    // Fetch all public tracks uploaded by artists from Firestore
+    const tracksRef = collection(db, 'tracks');
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const trackList = snapshot.docs.map(doc => ({
+    const unsubscribe = onSnapshot(tracksRef, (snapshot) => {
+      let trackList = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
+
+      // Filter public tracks for listeners
+      trackList = trackList.filter(t => t.isPublic !== false);
+
+      // Client-side sorting by createdAt timestamp
+      trackList.sort((a, b) => {
+        const getTime = (val) => {
+          if (!val) return 0;
+          if (val.toDate) return val.toDate().getTime();
+          if (val.seconds) return val.seconds * 1000;
+          return new Date(val).getTime() || 0;
+        };
+        return getTime(b.createdAt) - getTime(a.createdAt);
+      });
+
       setTracks(trackList);
       setLoading(false);
     }, (error) => {
