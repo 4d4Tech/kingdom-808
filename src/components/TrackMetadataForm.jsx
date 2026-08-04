@@ -10,8 +10,9 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
   const [genre, setGenre] = useState(GENRES[0]);
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
+  const [credits, setCredits] = useState('');
   const [isPublic, setIsPublic] = useState(true);
-  
+
   // Artwork state
   const [artworkFile, setArtworkFile] = useState(null);
   const [artworkUrl, setArtworkUrl] = useState('');
@@ -94,6 +95,7 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
       genre,
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       description,
+      credits,
       isPublic,
       artworkUrl: artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=300" // default fallback
     });
@@ -223,6 +225,17 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
               placeholder="Write a description for your track..." 
               className="input-field w-full textarea-field"
               rows={4}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="text-xs font-bold text-outline uppercase mb-1 block">Track Credits & Production</label>
+            <input 
+              type="text" 
+              value={credits} 
+              onChange={(e) => setCredits(e.target.value)}
+              placeholder="e.g. Written & Produced by Selah Grace" 
+              className="input-field w-full"
             />
           </div>
 

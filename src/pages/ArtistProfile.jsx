@@ -1,6 +1,71 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { db, auth } from '../firebase';
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { useAudio } from '../context/AudioProvider';
 
 const ArtistProfile = () => {
+  const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { playTrack, currentTrack, isPlaying } = useAudio();
+
+  useEffect(() => {
+    // Fetch tracks uploaded by user from Firestore
+    let q;
+    if (auth.currentUser) {
+      q = query(
+        collection(db, 'tracks'),
+        where('artistId', '==', auth.currentUser.uid),
+        orderBy('createdAt', 'desc')
+      );
+    } else {
+      q = query(
+        collection(db, 'tracks'),
+        orderBy('createdAt', 'desc')
+      );
+    }
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const trackList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setTracks(trackList);
+      setLoading(false);
+    }, (error) => {
+      console.error("Failed to fetch artist profile tracks:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handlePlayTrack = (track) => {
+    const playerTrack = {
+      id: track.id,
+      title: track.title,
+      artist: 'Selah Grace',
+      album: track.genre || 'Single',
+      img: track.artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=100",
+      audioUrl: track.audioUrl
+    };
+    playTrack(playerTrack);
+  };
+
+  const handlePlayRadio = () => {
+    if (tracks.length > 0) {
+      handlePlayTrack(tracks[0]);
+    } else {
+      alert("No uploaded tracks in your profile playlist yet. Head to Creator Studio to upload your first track!");
+    }
+  };
+
+  const formatDuration = (seconds) => {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="artist-profile fade-in">
       
@@ -20,8 +85,8 @@ const ArtistProfile = () => {
           
           <div className="flex gap-6 mb-xl">
             <div>
-              <h2 className="m-0" style={{fontFamily: "'Geist', sans-serif"}}>1.2M</h2>
-              <p className="text-xs uppercase tracking-wider font-bold m-0">Monthly Listeners</p>
+              <h2 className="m-0" style={{fontFamily: "'Geist', sans-serif"}}>{tracks.length}</h2>
+              <p className="text-xs uppercase tracking-wider font-bold m-0">Uploaded Songs</p>
             </div>
             <div>
               <h2 className="m-0" style={{fontFamily: "'Geist', sans-serif"}}>450K</h2>
@@ -30,8 +95,10 @@ const ArtistProfile = () => {
           </div>
 
           <div className="flex gap-4">
-            <button className="btn btn-primary btn-pill with-icon" style={{padding: '12px 32px'}}>
-              <span className="material-symbols-outlined fill-icon">play_arrow</span>
+            <button className="btn btn-primary btn-pill with-icon" style={{padding: '12px 32px'}} onClick={handlePlayRadio}>
+              <span className="material-symbols-outlined fill-icon">
+                {currentTrack && isPlaying ? 'pause' : 'play_arrow'}
+              </span>
               PLAY RADIO
             </button>
             <button className="btn btn-pill outline" style={{padding: '12px 48px', borderColor: 'var(--color-outline)'}}>
@@ -46,50 +113,81 @@ const ArtistProfile = () => {
         <div className="left-col">
           
           <div className="flex justify-between items-center mb-4">
-            <h3>Top Tracks</h3>
-            <span className="text-primary text-xs font-bold uppercase tracking-wider cursor-pointer">See All</span>
+            <h3>Uploaded Tracks</h3>
+            {tracks.length > 0 && (
+              <span className="text-primary text-xs font-bold uppercase tracking-wider cursor-pointer">
+                {tracks.length} {tracks.length === 1 ? 'Track' : 'Tracks'}
+              </span>
+            )}
           </div>
           
-          <div className="flex-col gap-2 mb-xl">
-            {[
-              { num: '01', title: 'Abiding Light', plays: '42,506,120 plays', time: '4:12', img: 'https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=100' },
-              { num: '02', title: 'Streams in the Desert', plays: '38,192,440 plays', time: '5:45', img: 'https://images.unsplash.com/photo-1472712739516-7ad2b786e1f7?auto=format&fit=crop&q=80&w=100' },
-              { num: '03', title: 'Still Waters (Live from Nashville)', plays: '12,440,011 plays', time: '6:30', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=100' }
-            ].map(track => (
-              <div key={track.num} className="track-row">
-                <span className="track-num text-sm">{track.num}</span>
-                <img src={track.img} alt={track.title} className="track-img" />
-                <div className="flex-1">
-                  <h4>{track.title}</h4>
-                  <p className="text-xs text-outline m-0">{track.plays}</p>
-                </div>
-                <span className="text-xs text-outline">{track.time}</span>
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="card text-center py-6 mb-xl">
+              <p className="text-xs text-outline m-0">Loading tracks...</p>
+            </div>
+          ) : tracks.length === 0 ? (
+            <div className="card text-center py-8 mb-xl" style={{ border: '1px dashed var(--color-outline)', background: 'transparent', borderRadius: '12px' }}>
+              <span className="material-symbols-outlined text-outline mb-2" style={{ fontSize: '36px' }}>library_music</span>
+              <p className="text-sm font-bold m-0" style={{ color: 'var(--color-on-surface)' }}>Blank Slate — No uploaded songs yet</p>
+              <p className="text-xs text-outline m-0 mt-1">Upload your audio tracks in Creator Studio to populate your artist profile playlist.</p>
+            </div>
+          ) : (
+            <div className="flex-col gap-2 mb-xl">
+              {tracks.map((track, idx) => {
+                const num = String(idx + 1).padStart(2, '0');
+                const isCurrent = currentTrack?.id === track.id;
+                return (
+                  <div key={track.id} className="track-row" onClick={() => handlePlayTrack(track)} style={{ cursor: 'pointer' }}>
+                    <span className="track-num text-sm">{num}</span>
+                    <img 
+                      src={track.artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=100"} 
+                      alt={track.title} 
+                      className="track-img" 
+                    />
+                    <div className="flex-1">
+                      <h4 style={{ color: isCurrent ? 'var(--color-primary)' : 'inherit' }}>{track.title}</h4>
+                      <p className="text-xs text-outline m-0 flex items-center gap-2">
+                        <span>{(track.playCount || track.play_count || 0).toLocaleString()} plays</span>
+                        {track.credits && (
+                          <>
+                            <span>•</span>
+                            <span className="italic" style={{ color: 'var(--color-primary)' }}>{track.credits}</span>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    <span className="text-xs text-outline">{formatDuration(track.duration)}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <div className="flex justify-between items-center mb-4 mt-xl">
             <h3>Discography</h3>
             <div className="flex bg-surface-container" style={{borderRadius: '99px', background: 'var(--color-surface-container)', padding: '4px'}}>
-              <button className="btn btn-pill bg-white text-xs py-1 px-4" style={{padding: '6px 16px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'}}>Albums</button>
-              <button className="btn btn-pill text-xs outline-none bg-transparent py-1 px-4 text-outline" style={{padding: '6px 16px', border: 'none'}}>Singles</button>
+              <button className="btn btn-pill bg-white text-xs py-1 px-4" style={{padding: '6px 16px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'}}>Releases</button>
             </div>
           </div>
 
-          <div className="grid-3col">
-            {[
-              { title: 'Eternal Echoes', info: '2023 • Album', img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=400' },
-              { title: 'Morning Star', info: '2022 • Album', img: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&q=80&w=400' },
-              { title: 'Field of Grace', info: '2021 • Album', img: 'https://images.unsplash.com/photo-1436891620584-47fd0e565afb?auto=format&fit=crop&q=80&w=400' },
-              { title: 'Resonance', info: '2020 • Album', img: 'https://images.unsplash.com/photo-1536148935331-408321065b18?auto=format&fit=crop&q=80&w=400' }
-            ].map(album => (
-              <div key={album.title} className="album-card">
-                <img src={album.img} alt={album.title} />
-                <h4 className="text-sm">{album.title}</h4>
-                <p className="text-xs text-outline m-0">{album.info}</p>
-              </div>
-            ))}
-          </div>
+          {tracks.length === 0 ? (
+            <div className="card text-center py-6" style={{ border: '1px dashed var(--color-outline)', background: 'transparent', borderRadius: '12px' }}>
+              <p className="text-xs text-outline m-0">No releases published yet.</p>
+            </div>
+          ) : (
+            <div className="grid-3col">
+              {tracks.map(track => (
+                <div key={track.id} className="album-card" onClick={() => handlePlayTrack(track)} style={{ cursor: 'pointer' }}>
+                  <img 
+                    src={track.artworkUrl || "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=400"} 
+                    alt={track.title} 
+                  />
+                  <h4 className="text-sm">{track.title}</h4>
+                  <p className="text-xs text-outline m-0">{track.genre || 'Single'}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
         </div>
 
@@ -118,30 +216,10 @@ const ArtistProfile = () => {
             </div>
           </div>
 
-          <h3 className="mb-4">Collaborations</h3>
-          <div className="flex-col mb-xl">
-            <div className="collab-row">
-              <img src="https://i.pravatar.cc/150?img=11" alt="Julian Rivers" />
-              <div className="flex-1">
-                <h4>Julian Rivers</h4>
-                <p className="text-xs text-outline m-0">Featured on 'Abiding Light'</p>
-              </div>
-              <span className="material-symbols-outlined text-outline">chevron_right</span>
-            </div>
-            <div className="collab-row">
-              <img src="https://i.pravatar.cc/150?img=47" alt="Eden Voss" />
-              <div className="flex-1">
-                <h4>Eden Voss</h4>
-                <p className="text-xs text-outline m-0">Featured on 'Still Waters'</p>
-              </div>
-              <span className="material-symbols-outlined text-outline">chevron_right</span>
-            </div>
-          </div>
-
           <div className="card" style={{backgroundColor: 'var(--color-surface-container)'}}>
             <p className="text-xs text-primary font-bold uppercase tracking-wider mb-4">Upcoming Tour</p>
             
-            <div className="tour-card bg-white">
+            <div className="tour-card bg-white mb-3">
               <div>
                 <p className="text-xs font-bold m-0 text-outline">OCT 24</p>
                 <h4 className="text-sm m-0">Red Rocks Amphitheatre</h4>

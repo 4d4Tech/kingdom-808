@@ -10,7 +10,7 @@ import TrackMetadataForm from '../components/TrackMetadataForm';
 import DashboardTrackList from '../components/DashboardTrackList';
 import TrackEditModal from '../components/TrackEditModal';
 
-const Dashboard = () => {
+const Dashboard = ({ userProfile }) => {
   const [subView, setSubView] = useState('library'); // 'library' or 'upload'
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -262,12 +262,12 @@ const Dashboard = () => {
   return (
     <div className="dashboard-page fade-in">
       {/* Upper Welcome Header */}
-      <div className="dashboard-welcome-header mb-8 mt-4">
-        <div className="flex justify-between items-end">
+      <div className="dashboard-welcome-header mb-8 mt-2">
+        <div className="flex justify-between items-end gap-6 flex-wrap">
           <div>
-            <h1 className="font-headline" style={{ fontSize: '42px', marginBottom: '4px' }}>Creator Studio</h1>
-            <p className="italic text-outline m-0" style={{ fontFamily: "'Playfair Display', serif", fontSize: '18px' }}>
-              Welcome back, Selah Grace. Share your divine harmony.
+            <h1 className="font-headline" style={{ fontSize: '40px', marginBottom: '8px', lineHeight: '1.2' }}>Creator Studio</h1>
+            <p className="italic text-outline m-0" style={{ fontFamily: "'Playfair Display', serif", fontSize: '18px', lineHeight: '1.5' }}>
+              Welcome back, {userProfile?.displayName || 'Artist'}. Share your divine harmony.
             </p>
           </div>
           {subView === 'library' && (
@@ -275,6 +275,7 @@ const Dashboard = () => {
               type="button" 
               className="btn btn-primary btn-pill with-icon"
               onClick={() => setSubView('upload-start')}
+              style={{ padding: '14px 28px' }}
             >
               <span className="material-symbols-outlined">add</span>
               Upload Track
@@ -285,33 +286,35 @@ const Dashboard = () => {
 
       {/* Stats Summary Panel */}
       <div className="grid-3col mb-8 stats-summary-grid">
-        <div className="card stat-card flex items-center gap-4">
+        <div className="card stat-card flex items-center gap-5">
           <div className="stat-icon-wrapper blue">
             <span className="material-symbols-outlined">library_music</span>
           </div>
           <div>
-            <p className="text-xs text-outline font-bold uppercase tracking-wider m-0">Total Tracks</p>
-            <h2 className="m-0 font-headline">{tracks.length}</h2>
+            <p className="text-xs text-outline font-bold uppercase tracking-wider m-0 mb-1">Total Tracks</p>
+            <h2 className="m-0 font-headline" style={{ fontSize: '32px', lineHeight: '1.2' }}>{tracks.length}</h2>
           </div>
         </div>
 
-        <div className="card stat-card flex items-center gap-4">
+        <div className="card stat-card flex items-center gap-5">
           <div className="stat-icon-wrapper gold">
             <span className="material-symbols-outlined">play_circle</span>
           </div>
           <div>
-            <p className="text-xs text-outline font-bold uppercase tracking-wider m-0">Total Streams</p>
-            <h2 className="m-0 font-headline">{totalPlays}</h2>
+            <p className="text-xs text-outline font-bold uppercase tracking-wider m-0 mb-1">Total Streams</p>
+            <h2 className="m-0 font-headline" style={{ fontSize: '32px', lineHeight: '1.2' }}>{totalPlays.toLocaleString()}</h2>
           </div>
         </div>
 
-        <div className="card stat-card flex items-center gap-4">
+        <div className="card stat-card flex items-center gap-5">
           <div className="stat-icon-wrapper green">
             <span className="material-symbols-outlined">visibility</span>
           </div>
           <div>
-            <p className="text-xs text-outline font-bold uppercase tracking-wider m-0">Public Catalog</p>
-            <h2 className="m-0 font-headline">{publicTracks} <span className="text-sm text-outline font-normal">/ {tracks.length}</span></h2>
+            <p className="text-xs text-outline font-bold uppercase tracking-wider m-0 mb-1">Public Catalog</p>
+            <h2 className="m-0 font-headline" style={{ fontSize: '32px', lineHeight: '1.2' }}>
+              {publicTracks} <span className="text-sm text-outline font-normal">/ {tracks.length}</span>
+            </h2>
           </div>
         </div>
       </div>

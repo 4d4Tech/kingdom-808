@@ -10,6 +10,7 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
   const [genre, setGenre] = useState(GENRES[0]);
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
+  const [credits, setCredits] = useState('');
   const [isPublic, setIsPublic] = useState(true);
   
   // Artwork state
@@ -26,6 +27,7 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
       setGenre(track.genre || GENRES[0]);
       setTags(track.tags ? track.tags.join(', ') : '');
       setDescription(track.description || '');
+      setCredits(track.credits || '');
       setIsPublic(track.isPublic !== false);
       setArtworkUrl(track.artworkUrl || '');
     }
@@ -88,6 +90,7 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
       genre,
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       description,
+      credits,
       isPublic,
       artworkUrl
     });
@@ -209,6 +212,17 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
                   placeholder="Write a description for your track..." 
                   className="input-field w-full textarea-field"
                   rows={3}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="text-xs font-bold text-outline uppercase mb-1 block">Track Credits & Production</label>
+                <input 
+                  type="text" 
+                  value={credits} 
+                  onChange={(e) => setCredits(e.target.value)}
+                  placeholder="e.g. Written & Produced by Selah Grace" 
+                  className="input-field w-full"
                 />
               </div>
 

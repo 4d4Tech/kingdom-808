@@ -3,7 +3,8 @@ import { AudioProvider } from './context/AudioProvider';
 import Sidebar from './components/Sidebar';
 import GlobalPlayer from './components/GlobalPlayer';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 // Pages
 import ArtistProfile from './pages/ArtistProfile';
@@ -13,6 +14,9 @@ import Wrapped from './pages/Wrapped';
 import FullScreenPlayer from './pages/FullScreenPlayer';
 import Dashboard from './pages/Dashboard';
 
+// Components
+import AuthModal from './components/AuthModal';
+
 function App() {
   const [currentView, setCurrentView] = useState(() => {
     const params = new URLSearchParams(window.location.search);
@@ -21,8 +25,22 @@ function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [authError, setAuthError] = useState(null);
 
+  // Modal Auth State
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalPrompt, setAuthModalPrompt] = useState('');
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const handleSignOut = () => {
+    auth.signOut().then(() => {
+      setCurrentView('artist');
+      setShowProfileMenu(false);
+    });
+  };
+
+  // Handle Real-time User Profile sync
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
@@ -44,14 +62,48 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!user) {
+      setUserProfile(null);
+      return;
+    }
+
+    if (user.isAnonymous) {
+      setUserProfile({ displayName: 'Guest Listener', isAnonymous: true });
+      return;
+    }
+
+    // Email user profile subscription
+    const userDocRef = doc(db, 'users', user.uid);
+    const unsubscribeProfile = onSnapshot(userDocRef, (snap) => {
+      if (snap.exists()) {
+        setUserProfile({ ...snap.data(), isAnonymous: false });
+      } else {
+        setUserProfile({ displayName: user.displayName || user.email || 'Artist', isAnonymous: false });
+      }
+    });
+
+    return () => unsubscribeProfile();
+  }, [user]);
+
+  // Router Gating
+  const handleNavigate = (view) => {
+    if (view === 'dashboard' && user?.isAnonymous) {
+      setAuthModalPrompt("Sign Up or Sign In to access your Creator Studio Dashboard");
+      setIsAuthModalOpen(true);
+    } else {
+      setCurrentView(view);
+    }
+  };
+
   const renderView = () => {
     switch (currentView) {
       case 'artist': return <ArtistProfile />;
       case 'playlist': return <PlaylistDetail />;
       case 'discover': return <Discover />;
       case 'wrapped': return <Wrapped />;
-      case 'player': return <FullScreenPlayer setCurrentView={setCurrentView} />;
-      case 'dashboard': return <Dashboard />;
+      case 'player': return <FullScreenPlayer setCurrentView={handleNavigate} />;
+      case 'dashboard': return <Dashboard userProfile={userProfile} />;
       default: return <ArtistProfile />;
     }
   };
@@ -112,12 +164,12 @@ function App() {
 
   return (
     <AudioProvider>
-      <div className="app-layout">
+      <div className="app-layout" onClick={() => setShowProfileMenu(false)}>
         
         {/* Persistent Sidebar */}
         <Sidebar 
           currentView={currentView} 
-          setCurrentView={setCurrentView} 
+          setCurrentView={handleNavigate} 
           isMobileMenuOpen={isMobileMenuOpen} 
         />
 
@@ -130,7 +182,10 @@ function App() {
               <div className="flex items-center gap-4">
                 <button 
                   className="icon-btn mobile-only" 
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMobileMenuOpen(!isMobileMenuOpen);
+                  }}
                 >
                   <span className="material-symbols-outlined">menu</span>
                 </button>
@@ -140,12 +195,70 @@ function App() {
                 </div>
               </div>
 
-              <div className="flex gap-4 items-center right-actions">
+              <div className="flex gap-4 items-center right-actions" onClick={(e) => e.stopPropagation()}>
                 <button className="icon-btn"><span className="material-symbols-outlined">notifications</span></button>
                 <button className="icon-btn"><span className="material-symbols-outlined">favorite_border</span></button>
-                <div className="avatar">
-                  <img src="https://i.pravatar.cc/100?img=11" alt="Profile" />
+                
+                <div className="profile-chip-container" style={{ position: 'relative' }}>
+                  <div className="profile-chip" onClick={() => setShowProfileMenu(!showProfileMenu)}>
+                    <span className="profile-name text-xs font-bold mr-2 hidden-mobile">
+                      {userProfile?.displayName || (user?.isAnonymous ? "Guest" : "Artist")}
+                    </span>
+                    <div className="avatar small-avatar">
+                      <img src={user?.isAnonymous ? "https://i.pravatar.cc/100?img=9" : "https://i.pravatar.cc/100?img=11"} alt="Profile" />
+                    </div>
+                  </div>
+
+                  {showProfileMenu && (
+                    <div className="profile-dropdown-menu card" style={{
+                      position: 'absolute',
+                      top: '100%',
+                      right: '0',
+                      marginTop: '8px',
+                      width: '220px',
+                      zIndex: '999',
+                      padding: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      backgroundColor: 'var(--color-surface-container-lowest)',
+                      border: '1px solid var(--color-surface-container-high)',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.1)'
+                    }}>
+                      <div className="dropdown-user-info border-b pb-2 mb-1" style={{ borderBottom: '1px solid var(--color-surface-container)' }}>
+                        <p className="font-bold text-sm m-0 truncate" style={{ color: 'var(--color-on-surface)' }}>
+                          {userProfile?.displayName || "Guest Listener"}
+                        </p>
+                        <p className="text-xs text-outline m-0 truncate" style={{ color: 'var(--color-outline)' }}>
+                          {user?.isAnonymous ? "Guest Account" : user?.email}
+                        </p>
+                      </div>
+                      
+                      {user?.isAnonymous ? (
+                        <button 
+                          type="button"
+                          className="btn btn-pill btn-xs btn-primary w-full text-center mt-1"
+                          onClick={() => {
+                            setAuthModalPrompt("Sign in to your account");
+                            setIsAuthModalOpen(true);
+                            setShowProfileMenu(false);
+                          }}
+                        >
+                          Sign In / Sign Up
+                        </button>
+                      ) : (
+                        <button 
+                          type="button"
+                          className="btn btn-pill btn-xs outline w-full text-center mt-1"
+                          onClick={handleSignOut}
+                        >
+                          Sign Out
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
+
               </div>
             </header>
           )}
@@ -164,6 +277,13 @@ function App() {
         {isMobileMenuOpen && (
           <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
         )}
+
+        {/* User Auth Modal Dialog */}
+        <AuthModal 
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          promptMessage={authModalPrompt}
+        />
 
       </div>
     </AudioProvider>
