@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { storage, auth } from '../firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { detectLyricsWithAI } from '../utils/aiLyricService';
 
 const GENRES = ['Glowstep', 'Antha', 'Heirwave', 'ZionSoul', 'Rhema&B', 'ZionDrill', 'Upperground', 'Worship', 'Gospel', 'Christian Hip Hop', 'Ambient'];
 
@@ -11,6 +12,8 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
   const [credits, setCredits] = useState('');
+  const [lyrics, setLyrics] = useState('');
+  const [isDetectingLyrics, setIsDetectingLyrics] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
 
   // Artwork state
@@ -20,21 +23,38 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
   const [isArtworkUploading, setIsArtworkUploading] = useState(false);
   const artworkInputRef = useRef(null);
 
-  // Pre-fill Title from filename and auto-slugify permalink
+  // Pre-fill Title from filename and auto-detect lyrics
   useEffect(() => {
     if (audioFileName) {
       // Remove extension
       const baseName = audioFileName.substring(0, audioFileName.lastIndexOf('.')) || audioFileName;
       setTitle(baseName);
       setPermalink(baseName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+      
+      // Run initial AI Lyric Detection
+      handleDetectLyrics(baseName, genre);
     }
   }, [audioFileName]);
 
+  const handleDetectLyrics = async (trackTitle = title, trackGenre = genre) => {
+    setIsDetectingLyrics(true);
+    try {
+      const detected = await detectLyricsWithAI(trackTitle, trackGenre, auth.currentUser?.displayName || 'Brandon Robinson');
+      setLyrics(detected);
+    } catch (err) {
+      console.error("AI Lyric Detection failed:", err);
+    } finally {
+      setIsDetectingLyrics(false);
+    }
+  };
+
   // Handle manual title changes and update permalink accordingly if not edited manually
   const handleTitleChange = (e) => {
-    const val = e.target.value;
-    setTitle(val);
-    setPermalink(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+    const newTitle = e.target.value;
+    setTitle(newTitle);
+    if (!permalink || permalink === title.toLowerCase().replace(/[^a-z0-9]+/g, '-')) {
+      setPermalink(newTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
+    }
   };
 
   // Handle Cover Art File Selection
@@ -96,6 +116,7 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       description,
       credits,
+      lyrics,
       isPublic,
       artworkUrl: artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=300" // default fallback
     });
@@ -234,8 +255,33 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
               type="text" 
               value={credits} 
               onChange={(e) => setCredits(e.target.value)}
-              placeholder="e.g. Written & Produced by Selah Grace" 
+              placeholder="e.g. Written & Produced by Brandon Robinson" 
               className="input-field w-full"
+            />
+          </div>
+
+          <div className="form-group">
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs font-bold text-outline uppercase block m-0">
+                Song Lyrics (AI Transcribed & Editable)
+              </label>
+              <button 
+                type="button" 
+                className="btn btn-pill outline btn-xs flex items-center gap-1"
+                onClick={() => handleDetectLyrics()}
+                disabled={isDetectingLyrics}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>auto_awesome</span>
+                {isDetectingLyrics ? "Detecting Lyrics..." : "AI Detect Lyrics"}
+              </button>
+            </div>
+            <textarea 
+              value={lyrics} 
+              onChange={(e) => setLyrics(e.target.value)}
+              placeholder="Song lyrics will be detected by AI automatically or type lyrics line by line..." 
+              className="input-field w-full textarea-field"
+              rows={6}
+              style={{ fontFamily: "'Geist', monospace", fontSize: '13px', lineHeight: '1.6' }}
             />
           </div>
 

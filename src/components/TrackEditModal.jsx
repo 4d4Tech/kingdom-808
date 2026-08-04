@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { storage, auth } from '../firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { detectLyricsWithAI } from '../utils/aiLyricService';
 
 const GENRES = ['Glowstep', 'Antha', 'Heirwave', 'ZionSoul', 'Rhema&B', 'ZionDrill', 'Upperground', 'Worship', 'Gospel', 'Christian Hip Hop', 'Ambient'];
 
@@ -11,6 +12,8 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
   const [tags, setTags] = useState('');
   const [description, setDescription] = useState('');
   const [credits, setCredits] = useState('');
+  const [lyrics, setLyrics] = useState('');
+  const [isDetectingLyrics, setIsDetectingLyrics] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
   
   // Artwork state
@@ -28,10 +31,23 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
       setTags(track.tags ? track.tags.join(', ') : '');
       setDescription(track.description || '');
       setCredits(track.credits || '');
+      setLyrics(track.lyrics || '');
       setIsPublic(track.isPublic !== false);
       setArtworkUrl(track.artworkUrl || '');
     }
   }, [track]);
+
+  const handleDetectLyrics = async () => {
+    setIsDetectingLyrics(true);
+    try {
+      const detected = await detectLyricsWithAI(title, genre, auth.currentUser?.displayName || 'Brandon Robinson');
+      setLyrics(detected);
+    } catch (err) {
+      console.error("AI Lyric Detection failed:", err);
+    } finally {
+      setIsDetectingLyrics(false);
+    }
+  };
 
   // Handle Cover Art File Selection
   const handleArtworkChange = (e) => {
@@ -91,6 +107,7 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
       tags: tags.split(',').map(t => t.trim()).filter(Boolean),
       description,
       credits,
+      lyrics,
       isPublic,
       artworkUrl
     });
@@ -221,8 +238,33 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
                   type="text" 
                   value={credits} 
                   onChange={(e) => setCredits(e.target.value)}
-                  placeholder="e.g. Written & Produced by Selah Grace" 
+                  placeholder="e.g. Written & Produced by Brandon Robinson" 
                   className="input-field w-full"
+                />
+              </div>
+
+              <div className="form-group">
+                <div className="flex justify-between items-center mb-1">
+                  <label className="text-xs font-bold text-outline uppercase block m-0">
+                    Song Lyrics (AI Transcribed & Editable)
+                  </label>
+                  <button 
+                    type="button" 
+                    className="btn btn-pill outline btn-xs flex items-center gap-1"
+                    onClick={() => handleDetectLyrics()}
+                    disabled={isDetectingLyrics}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>auto_awesome</span>
+                    {isDetectingLyrics ? "Detecting Lyrics..." : "AI Detect Lyrics"}
+                  </button>
+                </div>
+                <textarea 
+                  value={lyrics} 
+                  onChange={(e) => setLyrics(e.target.value)}
+                  placeholder="Song lyrics will be detected by AI automatically or type lyrics line by line..." 
+                  className="input-field w-full textarea-field"
+                  rows={5}
+                  style={{ fontFamily: "'Geist', monospace", fontSize: '13px', lineHeight: '1.6' }}
                 />
               </div>
 

@@ -16,11 +16,12 @@ import Dashboard from './pages/Dashboard';
 
 // Components
 import AuthModal from './components/AuthModal';
+import ProfileSettingsModal from './components/ProfileSettingsModal';
 
 function App() {
   const [currentView, setCurrentView] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('view') || 'artist';
+    return params.get('view') || 'discover'; // Default landing view for listeners (Apple Music / Spotify style)
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [loadingAuth, setLoadingAuth] = useState(true);
@@ -28,14 +29,15 @@ function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [authError, setAuthError] = useState(null);
 
-  // Modal Auth State
+  // Modal States
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalPrompt, setAuthModalPrompt] = useState('');
+  const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const handleSignOut = () => {
     auth.signOut().then(() => {
-      setCurrentView('artist');
+      setCurrentView('discover');
       setShowProfileMenu(false);
     });
   };
@@ -68,18 +70,43 @@ function App() {
       return;
     }
 
-    if (user.isAnonymous) {
-      setUserProfile({ displayName: 'Guest Listener', isAnonymous: true });
+    const storedLocal = localStorage.getItem('local_user_profile');
+    const parsedLocal = storedLocal ? JSON.parse(storedLocal) : null;
+    const isBrandon = Boolean(user.email && user.email.toLowerCase() === 'brandonrobinson81@gmail.com');
+
+    if (user.isAnonymous && !isBrandon) {
+      setUserProfile(parsedLocal || { 
+        displayName: 'Selah Grace', 
+        tagline: 'Modern Worship & Ethereal Melodies',
+        bio: 'Selah Grace is a multi-award winning worship leader and songwriter known for her ethereal melodies.',
+        avatarUrl: 'https://i.pravatar.cc/300?img=11',
+        isArtist: false,
+        isAnonymous: true 
+      });
       return;
     }
 
-    // Email user profile subscription
+    // Email / Registered Artist profile subscription
     const userDocRef = doc(db, 'users', user.uid);
     const unsubscribeProfile = onSnapshot(userDocRef, (snap) => {
       if (snap.exists()) {
-        setUserProfile({ ...snap.data(), isAnonymous: false });
+        const data = snap.data();
+        setUserProfile({ 
+          ...data, 
+          email: user.email || data.email,
+          isArtist: true, 
+          isAnonymous: false 
+        });
       } else {
-        setUserProfile({ displayName: user.displayName || user.email || 'Artist', isAnonymous: false });
+        setUserProfile(parsedLocal || { 
+          displayName: user.displayName || (isBrandon ? 'Brandon Robinson' : user.email) || 'Artist', 
+          email: user.email,
+          tagline: 'Modern Worship & Ethereal Melodies',
+          avatarUrl: 'https://i.pravatar.cc/300?img=11',
+          isArtist: true,
+          role: 'artist',
+          isAnonymous: false 
+        });
       }
     });
 
@@ -88,8 +115,10 @@ function App() {
 
   // Router Gating
   const handleNavigate = (view) => {
-    if (view === 'dashboard' && user?.isAnonymous) {
-      setAuthModalPrompt("Sign Up or Sign In to access your Creator Studio Dashboard");
+    const isBrandon = Boolean(user?.email && user.email.toLowerCase() === 'brandonrobinson81@gmail.com');
+    const isArtist = (user && !user.isAnonymous) || isBrandon || userProfile?.isArtist;
+    if ((view === 'dashboard' || view === 'artist') && !isArtist) {
+      setAuthModalPrompt("Sign in as an Artist to access Creator Studio & manage your music catalog");
       setIsAuthModalOpen(true);
     } else {
       setCurrentView(view);
@@ -98,13 +127,13 @@ function App() {
 
   const renderView = () => {
     switch (currentView) {
-      case 'artist': return <ArtistProfile />;
-      case 'playlist': return <PlaylistDetail />;
       case 'discover': return <Discover />;
+      case 'playlist': return <PlaylistDetail />;
       case 'wrapped': return <Wrapped />;
       case 'player': return <FullScreenPlayer setCurrentView={handleNavigate} />;
+      case 'artist': return <ArtistProfile userProfile={userProfile} onOpenSettings={() => setIsProfileSettingsOpen(true)} />;
       case 'dashboard': return <Dashboard userProfile={userProfile} />;
-      default: return <ArtistProfile />;
+      default: return <Discover />;
     }
   };
 
@@ -171,6 +200,13 @@ function App() {
           currentView={currentView} 
           setCurrentView={handleNavigate} 
           isMobileMenuOpen={isMobileMenuOpen} 
+          onOpenSettings={() => setIsProfileSettingsOpen(true)}
+          user={user}
+          userProfile={userProfile}
+          onOpenArtistAuth={() => {
+            setAuthModalPrompt("Sign in or register as an Artist to upload tracks and manage your catalog");
+            setIsAuthModalOpen(true);
+          }}
         />
 
         {/* Main Content Area */}
@@ -205,7 +241,7 @@ function App() {
                       {userProfile?.displayName || (user?.isAnonymous ? "Guest" : "Artist")}
                     </span>
                     <div className="avatar small-avatar">
-                      <img src={user?.isAnonymous ? "https://i.pravatar.cc/100?img=9" : "https://i.pravatar.cc/100?img=11"} alt="Profile" />
+                      <img src={userProfile?.avatarUrl || (user?.isAnonymous ? "https://i.pravatar.cc/100?img=9" : "https://i.pravatar.cc/100?img=11")} alt="Profile" />
                     </div>
                   </div>
 
@@ -233,6 +269,18 @@ function App() {
                           {user?.isAnonymous ? "Guest Account" : user?.email}
                         </p>
                       </div>
+
+                      <button 
+                        type="button"
+                        className="btn btn-pill btn-xs outline w-full text-center flex items-center justify-center gap-2"
+                        onClick={() => {
+                          setIsProfileSettingsOpen(true);
+                          setShowProfileMenu(false);
+                        }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>edit</span>
+                        Edit Profile
+                      </button>
                       
                       {user?.isAnonymous ? (
                         <button 
@@ -283,6 +331,14 @@ function App() {
           isOpen={isAuthModalOpen}
           onClose={() => setIsAuthModalOpen(false)}
           promptMessage={authModalPrompt}
+        />
+
+        {/* Profile Settings Modal */}
+        <ProfileSettingsModal 
+          isOpen={isProfileSettingsOpen}
+          onClose={() => setIsProfileSettingsOpen(false)}
+          userProfile={userProfile}
+          user={user}
         />
 
       </div>

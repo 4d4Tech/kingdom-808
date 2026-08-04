@@ -1,28 +1,249 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { useAudio } from '../context/AudioProvider';
+
+const ALL_GENRES = [
+  { name: 'Worship', desc: 'Deep reflection and communal praise.', img: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Glowstep', desc: 'Luminous synth melodies & ambient bass.', img: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80&w=600' },
+  { name: 'ZionSoul', desc: 'Soulful rhythms rooted in divine grace.', img: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Heirwave', desc: 'Ethereal ambient pads and vocal harmonies.', img: 'https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Rhema&B', desc: 'Contemporary R&B laced with sacred truth.', img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&q=80&w=600' },
+  { name: 'ZionDrill', desc: 'Energetic urban drill with spiritual lyrics.', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Upperground', desc: 'Uplifting house & electronic worship.', img: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Gospel', desc: 'The heartbeat of tradition, choir & soul.', img: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Antha', desc: 'Atmospheric acoustic & instrumental devotion.', img: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?auto=format&fit=crop&q=80&w=600' },
+  { name: 'CHH', desc: 'Bold truth through urban hip hop rhythm.', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600' },
+  { name: 'Ambient', desc: 'Peaceful instrumental soundscapes.', img: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&q=80&w=600' }
+];
 
 const Discover = () => {
+  const [uploadedTracks, setUploadedTracks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedGenreFilter, setSelectedGenreFilter] = useState('All');
+  const { playTrack, currentTrack, isPlaying } = useAudio();
+
+  useEffect(() => {
+    // Listen to real-time tracks collection from Firestore
+    const tracksRef = collection(db, 'tracks');
+
+    const unsubscribe = onSnapshot(tracksRef, (snapshot) => {
+      let trackList = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+      // Filter for public tracks (isPublic !== false)
+      trackList = trackList.filter(t => t.isPublic !== false);
+
+      // Client-side sorting by createdAt timestamp
+      trackList.sort((a, b) => {
+        const getTime = (val) => {
+          if (!val) return 0;
+          if (val.toDate) return val.toDate().getTime();
+          if (val.seconds) return val.seconds * 1000;
+          return new Date(val).getTime() || 0;
+        };
+        return getTime(b.createdAt) - getTime(a.createdAt);
+      });
+
+      setUploadedTracks(trackList);
+      setLoading(false);
+    }, (err) => {
+      console.error("Failed to fetch tracks in Discover page:", err);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const handlePlayChartTrack = (track) => {
+    playTrack({
+      id: track.id || track.title.toLowerCase().replace(/\s+/g, '-'),
+      title: track.title,
+      artist: track.artist || track.artistName || 'Brandon Robinson',
+      album: track.genre || 'Single',
+      img: track.artworkUrl || track.img || "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=400",
+      audioUrl: track.audioUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    });
+  };
+
+  const formatDuration = (seconds) => {
+    if (!seconds || isNaN(seconds)) return '3:45';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Helper: Find tracks belonging to a genre
+  const getTracksForGenre = (genreName) => {
+    return uploadedTracks.filter(t => {
+      if (!t.genre) return false;
+      const g = t.genre.toLowerCase();
+      const target = genreName.toLowerCase();
+      return g === target || (target === 'chh' && g.includes('hip hop'));
+    });
+  };
+
+  // Filtered tracks list if user selected a genre filter
+  const displayedTracks = selectedGenreFilter === 'All' 
+    ? uploadedTracks 
+    : getTracksForGenre(selectedGenreFilter);
+
+  // Select hero track
+  const heroTrack = displayedTracks.length > 0 ? displayedTracks[0] : (uploadedTracks[0] || null);
+
   return (
     <div className="discover-page fade-in">
       
-      <div className="mb-xl mt-4">
-        <h1 className="font-headline" style={{fontSize: '48px', marginBottom: '8px'}}>Celestial 100</h1>
-        <p className="italic text-outline m-0" style={{fontFamily: "'Playfair Display', serif", fontSize: '20px'}}>
-          The definitive weekly countdown of global Christian excellence.
-        </p>
+      {/* Header Banner */}
+      <div className="mb-xl mt-4 flex justify-between items-end flex-wrap gap-4">
+        <div>
+          <h1 className="font-headline" style={{ fontSize: '44px', marginBottom: '8px' }}>Listen Now</h1>
+          <p className="italic text-outline m-0" style={{ fontFamily: "'Playfair Display', serif", fontSize: '20px' }}>
+            Discover celestial melodies, top charting worship, and divine Christian excellence.
+          </p>
+        </div>
+        {uploadedTracks.length > 0 && (
+          <div className="flex gap-2 items-center">
+            <span className="badge" style={{ backgroundColor: 'rgba(0, 93, 144, 0.1)', color: 'var(--color-primary)', padding: '8px 18px', borderRadius: '99px', fontSize: '13px', fontWeight: 'bold' }}>
+              🎵 {uploadedTracks.length} Artist Tracks Online
+            </span>
+            {selectedGenreFilter !== 'All' && (
+              <button 
+                type="button" 
+                className="btn btn-pill outline btn-xs"
+                onClick={() => setSelectedGenreFilter('All')}
+              >
+                Clear Filter ({selectedGenreFilter})
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="desktop-col-layout mb-xl" style={{gap: '32px'}}>
+      {/* Featured Community Artist Uploads Section */}
+      <div className="mb-xl">
+        <div className="flex justify-between items-baseline mb-4 flex-wrap gap-2">
+          <h2 className="m-0">
+            {selectedGenreFilter === 'All' ? 'New Releases from Artists' : `Releases in ${selectedGenreFilter}`}
+          </h2>
+          <span className="text-primary text-xs font-bold uppercase tracking-wider">
+            {displayedTracks.length} {displayedTracks.length === 1 ? 'Track' : 'Tracks'} Available
+          </span>
+        </div>
+
+        {loading ? (
+          <div className="card text-center py-6">
+            <p className="text-xs text-outline m-0">Loading community tracks...</p>
+          </div>
+        ) : displayedTracks.length === 0 ? (
+          <div className="card p-6 text-center" style={{ borderRadius: '16px', border: '1px dashed var(--color-outline-variant)' }}>
+            <span className="material-symbols-outlined text-outline mb-2" style={{ fontSize: '36px' }}>library_music</span>
+            <p className="text-sm font-bold m-0">No songs uploaded in {selectedGenreFilter} yet</p>
+            <p className="text-xs text-outline m-0 mt-1">Artists can upload audio tracks in Creator Studio to feature their music in this genre.</p>
+            {selectedGenreFilter !== 'All' && (
+              <button type="button" className="btn btn-pill outline btn-xs mt-3" onClick={() => setSelectedGenreFilter('All')}>
+                View All Uploaded Tracks
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="grid-3col gap-6">
+            {displayedTracks.map((track) => {
+              const isCurrent = currentTrack?.id === track.id;
+              return (
+                <div 
+                  key={track.id} 
+                  className="card p-4 hover-elevate cursor-pointer flex-col gap-3"
+                  onClick={() => handlePlayChartTrack(track)}
+                  style={{ borderRadius: '20px', transition: 'all 0.2s ease' }}
+                >
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: '14px', overflow: 'hidden' }}>
+                    <img 
+                      src={track.artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=400"} 
+                      alt={track.title} 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <button 
+                      type="button" 
+                      className="play-fab"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePlayChartTrack(track);
+                      }}
+                      style={{
+                        position: 'absolute',
+                        bottom: '12px',
+                        right: '12px',
+                        width: '48px',
+                        height: '48px',
+                        backgroundColor: 'var(--color-primary)',
+                        color: 'white',
+                        borderRadius: '50%',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <span className="material-symbols-outlined fill-icon" style={{ fontSize: '28px' }}>
+                        {isCurrent && isPlaying ? 'pause' : 'play_arrow'}
+                      </span>
+                    </button>
+                  </div>
+
+                  <div>
+                    <h4 className="m-0 text-base font-bold truncate">{track.title}</h4>
+                    <p className="text-xs text-outline m-0 mt-1 flex items-center justify-between">
+                      <span className="font-semibold text-primary">Brandon Robinson</span>
+                      <span className="badge outline text-xs" style={{ fontSize: '10px', padding: '2px 8px' }}>{track.genre || 'Worship'}</span>
+                    </p>
+                    {track.credits && (
+                      <p className="text-xs text-outline italic m-0 mt-1 truncate">
+                        {track.credits}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Hero Section & Climbers */}
+      <div className="desktop-col-layout mb-xl" style={{ gap: '32px' }}>
         <div className="left-col">
-          <div className="celestial-hero m-0" style={{height: '100%', minHeight: '320px'}}>
-            <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=1200" alt="Heaven on Earth" />
-            <div className="celestial-overlay" style={{padding: '48px'}}>
+          <div className="celestial-hero m-0" style={{ height: '100%', minHeight: '320px', borderRadius: '24px', overflow: 'hidden', position: 'relative' }}>
+            <img 
+              src={heroTrack?.artworkUrl || "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=1200"} 
+              alt={heroTrack?.title || "Heaven on Earth"} 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
+            <div className="celestial-overlay" style={{ padding: '44px' }}>
               <div>
-                <span className="badge" style={{backgroundColor: '#9a7500', color: 'white', padding: '6px 16px', fontSize: '12px', fontWeight: 'bold', letterSpacing: '1px'}}>CHART TOPPER #1</span>
-                <h1 className="font-headline text-white mt-4" style={{fontSize: '56px', marginBottom: '8px', fontStyle: 'italic'}}>Heaven on Earth</h1>
-                <p className="text-primary-fixed-dim" style={{fontFamily: "'Geist', sans-serif", fontSize: '24px', fontWeight: 'bold', margin: '0'}}>Divinity Collective</p>
+                <span className="badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '6px 16px', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', borderRadius: '99px' }}>
+                  FEATURED RELEASE #1
+                </span>
+                <h1 className="font-headline text-white mt-4 truncate" style={{ fontSize: '48px', marginBottom: '8px', fontStyle: 'italic' }}>
+                  {heroTrack ? heroTrack.title : "Heaven on Earth"}
+                </h1>
+                <p className="text-white m-0" style={{ fontFamily: "'Geist', sans-serif", fontSize: '22px', fontWeight: 'bold', opacity: 0.9 }}>
+                  {heroTrack ? "Brandon Robinson" : "Divinity Collective"}
+                </p>
               </div>
-              <button className="play-fab" style={{position: 'absolute', bottom: '48px', right: '48px', width: '64px', height: '64px', backgroundColor: 'white'}}>
-                <span className="material-symbols-outlined fill-icon text-primary" style={{fontSize: '32px'}}>play_arrow</span>
+              <button 
+                type="button"
+                className="play-fab" 
+                onClick={() => handlePlayChartTrack(heroTrack || { title: 'Heaven on Earth', artist: 'Divinity Collective', img: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=400' })}
+                style={{ position: 'absolute', bottom: '40px', right: '40px', width: '64px', height: '64px', backgroundColor: 'white', borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}
+              >
+                <span className="material-symbols-outlined fill-icon text-primary" style={{ fontSize: '36px' }}>
+                  {currentTrack?.title === (heroTrack ? heroTrack.title : 'Heaven on Earth') && isPlaying ? 'pause' : 'play_arrow'}
+                </span>
               </button>
             </div>
           </div>
@@ -32,71 +253,25 @@ const Discover = () => {
           <p className="text-xs text-primary font-bold uppercase tracking-wider mb-4">Fastest Climbers</p>
           <div className="flex-col gap-4">
             {[
-              { rank: '02', title: 'Sacred Morning', artist: 'Zion Worship', img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=100' },
-              { rank: '03', title: 'Grace Flows', artist: 'Elijah King', img: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&q=80&w=100' },
-              { rank: '04', title: 'Praise Rising', artist: 'Kingdom Voices', img: 'https://images.unsplash.com/photo-1436891620584-47fd0e565afb?auto=format&fit=crop&q=80&w=100' }
+              { id: 'sacred-morning', rank: '02', title: 'Sacred Morning', artist: 'Zion Worship', img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=100' },
+              { id: 'grace-flows', rank: '03', title: 'Grace Flows', artist: 'Elijah King', img: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&q=80&w=100' },
+              { id: 'praise-rising', rank: '04', title: 'Praise Rising', artist: 'Kingdom Voices', img: 'https://images.unsplash.com/photo-1436891620584-47fd0e565afb?auto=format&fit=crop&q=80&w=100' }
             ].map(item => (
-              <div key={item.rank} className="fastest-climbers-card">
-                <span className="font-headline text-surface-container-highest" style={{fontSize: '36px', fontStyle: 'italic'}}>{item.rank}</span>
-                <img src={item.img} alt={item.title} style={{width: '56px', height: '56px', borderRadius: '8px', objectFit: 'cover'}} />
+              <div 
+                key={item.rank} 
+                className="fastest-climbers-card cursor-pointer"
+                onClick={() => handlePlayChartTrack(item)}
+              >
+                <span className="font-headline text-surface-container-highest" style={{ fontSize: '32px', fontStyle: 'italic' }}>{item.rank}</span>
+                <img src={item.img} alt={item.title} style={{ width: '56px', height: '56px', borderRadius: '12px', objectFit: 'cover' }} />
                 <div className="flex-1">
                   <h4 className="m-0 text-sm">{item.title}</h4>
                   <p className="m-0 text-xs text-outline">{item.artist}</p>
                 </div>
-                <span className="material-symbols-outlined text-secondary-container">trending_up</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid-2col mb-xl">
-        <div>
-          <div className="flex justify-between items-baseline mb-4">
-            <h2>Top 10 This Week</h2>
-            <span className="text-primary text-xs font-bold italic cursor-pointer">See Full History</span>
-          </div>
-          <div className="flex-col gap-2">
-            {[
-              { num: '1', title: 'Lion of Judah', artist: 'Roar Collective', time: '04:22' },
-              { num: '2', title: 'Mercy Seat', artist: 'The Elders', time: '05:45' },
-              { num: '3', title: 'Everlasting', artist: 'Grace City', time: '03:50' }
-            ].map(item => (
-              <div key={item.num} className="track-row py-4">
-                <span className="track-num text-lg" style={{width: '40px'}}>{item.num}</span>
-                <div className="flex-1">
-                  <h4 className="m-0 text-base">{item.title}</h4>
-                  <p className="m-0 text-xs text-outline">{item.artist}</p>
-                </div>
-                <span className="text-sm font-bold text-outline mr-4">{item.time}</span>
-                <button className="icon-btn-circle outline" style={{width: '32px', height: '32px'}}>
-                  <span className="material-symbols-outlined text-sm">play_arrow</span>
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <div className="flex justify-between items-baseline mb-4">
-            <h2>Top 10 This Month</h2>
-            <span className="text-primary text-xs font-bold italic cursor-pointer">Historical Records</span>
-          </div>
-          <div className="flex-col gap-2">
-            {[
-              { num: '1', title: 'Brokenness to Glory', artist: 'Sara Hezekiah', time: '06:12' },
-              { num: '2', title: 'Unseen Faith', artist: 'Thomas Peter', time: '04:15' },
-              { num: '3', title: 'Restoration', artist: 'Davidic Heart', time: '05:01' }
-            ].map(item => (
-              <div key={item.num} className="track-row py-4">
-                <span className="track-num text-lg" style={{width: '40px'}}>{item.num}</span>
-                <div className="flex-1">
-                  <h4 className="m-0 text-base">{item.title}</h4>
-                  <p className="m-0 text-xs text-outline">{item.artist}</p>
-                </div>
-                <span className="text-sm font-bold text-outline mr-4">{item.time}</span>
-                <button className="icon-btn-circle outline" style={{width: '32px', height: '32px'}}>
-                  <span className="material-symbols-outlined text-sm">play_arrow</span>
+                <button type="button" className="icon-btn-circle outline small">
+                  <span className="material-symbols-outlined text-sm">
+                    {currentTrack?.title === item.title && isPlaying ? 'pause' : 'play_arrow'}
+                  </span>
                 </button>
               </div>
             ))}
@@ -104,36 +279,110 @@ const Discover = () => {
         </div>
       </div>
 
+      {/* Explore Created Genres Section */}
       <div className="mb-xl">
-        <h2 className="mb-4">Explore Genres</h2>
+        <div className="flex justify-between items-baseline mb-4">
+          <h2>Explore Trinity Genres</h2>
+          <span className="text-primary text-xs font-bold uppercase tracking-wider">{ALL_GENRES.length} Genres Active</span>
+        </div>
+
         <div className="genre-cards">
-          <div className="genre-card">
-            <img src="https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&q=80&w=600" alt="Worship" />
-            <div className="overlay"></div>
-            <div className="content">
-              <h3>Worship</h3>
-              <p className="text-sm mb-4" style={{maxWidth: '80%'}}>Deep reflection and communal praise.</p>
-              <button className="btn btn-pill outline text-white" style={{borderColor: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)'}}>Explore Worship</button>
-            </div>
-          </div>
-          <div className="genre-card">
-            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&q=80&w=600" alt="Gospel" />
-            <div className="overlay"></div>
-            <div className="content">
-              <h3>Gospel</h3>
-              <p className="text-sm mb-4" style={{maxWidth: '80%'}}>The heartbeat of tradition and soul.</p>
-              <button className="btn btn-pill outline text-white" style={{borderColor: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)'}}>Explore Gospel</button>
-            </div>
-          </div>
-          <div className="genre-card">
-            <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600" alt="CHH" />
-            <div className="overlay"></div>
-            <div className="content">
-              <h3>CHH</h3>
-              <p className="text-sm mb-4" style={{maxWidth: '80%'}}>Bold truth through urban rhythm.</p>
-              <button className="btn btn-pill outline text-white" style={{borderColor: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(4px)'}}>Explore CHH</button>
-            </div>
-          </div>
+          {ALL_GENRES.map((g) => {
+            const matchingTracks = getTracksForGenre(g.name);
+            const songCount = matchingTracks.length;
+            const hasUploads = songCount > 0;
+            const isSelected = selectedGenreFilter === g.name;
+
+            return (
+              <div 
+                key={g.name} 
+                className={`genre-card ${isSelected ? 'active-genre-card' : ''}`}
+                style={{
+                  position: 'relative',
+                  border: isSelected ? '3px solid var(--color-primary)' : (hasUploads ? '2px solid rgba(0,93,144,0.4)' : 'none')
+                }}
+              >
+                {/* Upper Right Corner Song Count Badge */}
+                {hasUploads && (
+                  <span 
+                    className="badge"
+                    style={{ 
+                      position: 'absolute',
+                      top: '16px',
+                      right: '16px',
+                      zIndex: 3,
+                      backgroundColor: 'var(--color-primary)', 
+                      color: 'white', 
+                      padding: '6px 14px', 
+                      borderRadius: '9999px',
+                      fontSize: '11px',
+                      fontWeight: 'bold',
+                      letterSpacing: '0.05em',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>music_note</span>
+                    {songCount} {songCount === 1 ? 'Song' : 'Songs'}
+                  </span>
+                )}
+
+                <img src={g.img} alt={g.name} />
+                <div className="overlay"></div>
+                <div className="content">
+                  
+                  <h3 className="m-0 mb-1" style={{ fontSize: '28px' }}>{g.name}</h3>
+                  <p className="text-sm mb-4" style={{ maxWidth: '90%', lineHeight: '1.4', opacity: 0.9 }}>
+                    {g.desc}
+                  </p>
+
+                  {hasUploads && matchingTracks[0] && (
+                    <p className="text-xs italic text-primary-fixed-dim m-0 mb-3 truncate" style={{ color: 'rgba(255,255,255,0.95)' }}>
+                      Includes "{matchingTracks[0].title}" by Brandon Robinson
+                    </p>
+                  )}
+
+                  <div className="flex gap-2">
+                    <button 
+                      type="button" 
+                      className={`btn btn-pill ${hasUploads ? 'btn-primary' : 'outline text-white'}`}
+                      onClick={() => {
+                        if (hasUploads) {
+                          handlePlayChartTrack(matchingTracks[0]);
+                        } else {
+                          setSelectedGenreFilter(g.name);
+                        }
+                      }}
+                      style={{ 
+                        borderColor: 'rgba(255,255,255,0.5)', 
+                        backdropFilter: 'blur(4px)',
+                        padding: '8px 20px',
+                        fontSize: '12px'
+                      }}
+                    >
+                      {hasUploads ? `Play ${g.name}` : `Explore ${g.name}`}
+                    </button>
+                    <button 
+                      type="button"
+                      className="btn btn-pill outline text-white"
+                      onClick={() => setSelectedGenreFilter(g.name)}
+                      style={{ 
+                        borderColor: 'rgba(255,255,255,0.4)', 
+                        backdropFilter: 'blur(4px)',
+                        padding: '8px 16px',
+                        fontSize: '12px'
+                      }}
+                    >
+                      Filter
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

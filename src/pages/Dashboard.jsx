@@ -75,7 +75,7 @@ const Dashboard = ({ userProfile }) => {
   // Handle Drag & Drop File Selection (Start background upload immediately)
   const handleFileSelect = async (file) => {
     if (!auth.currentUser) return;
-    
+
     // Generate single aligned trackId
     const trackId = crypto.randomUUID();
     setUploadTrackId(trackId);
@@ -94,17 +94,17 @@ const Dashboard = ({ userProfile }) => {
     const task = uploadBytesResumable(storageRef, file);
     setUploadTask(task);
 
-    task.on('state_changed', 
+    task.on('state_changed',
       (snapshot) => {
         const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
         setAudioProgress(progress);
-      }, 
+      },
       (error) => {
         console.error("Audio upload failed:", error);
         alert("Audio upload failed.");
         resetUploadState();
         setSubView('library');
-      }, 
+      },
       async () => {
         const downloadUrl = await getDownloadURL(task.snapshot.ref);
         setAudioUrl(downloadUrl);
@@ -271,11 +271,11 @@ const Dashboard = ({ userProfile }) => {
             </p>
           </div>
           {subView === 'library' && (
-            <button 
-              type="button" 
+            <button
+              type="button"
               className="btn btn-primary btn-pill with-icon"
               onClick={() => setSubView('upload-start')}
-              style={{ padding: '14px 28px' }}
+              style={{ padding: '14px 28px', marginBottom: '10px' }}
             >
               <span className="material-symbols-outlined">add</span>
               Upload Track
@@ -320,91 +320,101 @@ const Dashboard = ({ userProfile }) => {
       </div>
 
       {/* Main Studio View Area */}
-      {subView === 'upload-start' && (
-        <div className="card fade-in">
-          <div className="flex justify-between items-center mb-6 border-b pb-4">
-            <h2 className="m-0">Upload Track</h2>
-            <button type="button" className="btn outline btn-xs py-1" onClick={() => setSubView('library')}>Back to Library</button>
-          </div>
-          <UploadDropzone onFileSelect={handleFileSelect} />
-        </div>
-      )}
-
-      {subView === 'upload' && uploadingFile && (
-        <TrackMetadataForm 
-          trackId={uploadTrackId}
-          audioFileName={uploadingFile.name}
-          audioUploadProgress={audioProgress}
-          isAudioUploading={isAudioUploading}
-          onSave={handleSaveTrack}
-          onCancel={handleCancelUpload}
-        />
-      )}
-
-      {subView === 'library' && (
-        <div className="card studio-library-card">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="m-0">Your Track Library</h2>
-            <span className="text-xs text-outline font-bold">{tracks.length} track(s) found</span>
-          </div>
-
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="simple-spinner mb-4"></div>
-              <p className="text-outline text-sm">Retrieving your creative library...</p>
+      {
+        subView === 'upload-start' && (
+          <div className="card fade-in">
+            <div className="flex justify-between items-center mb-6 border-b pb-4">
+              <h2 className="m-0">Upload Track</h2>
+              <button type="button" className="btn outline btn-xs py-1" onClick={() => setSubView('library')}>Back to Library</button>
             </div>
-          ) : (
-            <DashboardTrackList 
-              tracks={tracks}
-              onPlay={handlePlayTrack}
-              onEdit={setEditingTrack}
-              onDelete={setDeletingTrack}
-              onShare={handleShareTrack}
-            />
-          )}
-        </div>
-      )}
+            <UploadDropzone onFileSelect={handleFileSelect} />
+          </div>
+        )
+      }
+
+      {
+        subView === 'upload' && uploadingFile && (
+          <TrackMetadataForm
+            trackId={uploadTrackId}
+            audioFileName={uploadingFile.name}
+            audioUploadProgress={audioProgress}
+            isAudioUploading={isAudioUploading}
+            onSave={handleSaveTrack}
+            onCancel={handleCancelUpload}
+          />
+        )
+      }
+
+      {
+        subView === 'library' && (
+          <div className="card studio-library-card">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="m-0">Your Track Library</h2>
+              <span className="text-xs text-outline font-bold">{tracks.length} track(s) found</span>
+            </div>
+
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="simple-spinner mb-4"></div>
+                <p className="text-outline text-sm">Retrieving your creative library...</p>
+              </div>
+            ) : (
+              <DashboardTrackList
+                tracks={tracks}
+                onPlay={handlePlayTrack}
+                onEdit={setEditingTrack}
+                onDelete={setDeletingTrack}
+                onShare={handleShareTrack}
+              />
+            )}
+          </div>
+        )
+      }
 
       {/* Edit Track Modal Dialog */}
-      {editingTrack && (
-        <TrackEditModal 
-          track={editingTrack}
-          onSave={handleSaveEdit}
-          onClose={() => setEditingTrack(null)}
-        />
-      )}
+      {
+        editingTrack && (
+          <TrackEditModal
+            track={editingTrack}
+            onSave={handleSaveEdit}
+            onClose={() => setEditingTrack(null)}
+          />
+        )
+      }
 
       {/* Deletion Confirmation Dialog */}
-      {deletingTrack && (
-        <div className="modal-overlay fade-in">
-          <div className="modal-container card dialog grow-out p-6 max-w-sm text-center">
-            <span className="material-symbols-outlined text-error mb-4" style={{ fontSize: '48px', color: '#ff5449' }}>warning</span>
-            <h3>Delete Track?</h3>
-            <p className="text-outline text-sm mb-6 leading-relaxed">
-              Are you sure you want to permanently delete <strong>{deletingTrack.title}</strong>? 
-              This will remove the Firestore metadata and delete all associated audio/cover files from storage. This action is irreversible.
-            </p>
-            <div className="flex gap-4 justify-center">
-              <button 
-                type="button" 
-                className="btn outline"
-                onClick={() => setDeletingTrack(null)}
-              >
-                Cancel
-              </button>
-              <button 
-                type="button" 
-                className="btn btn-primary"
-                style={{ backgroundColor: '#ff5449', borderColor: '#ff5449', color: 'white' }}
-                onClick={handleDeleteConfirm}
-              >
-                Permanently Delete
-              </button>
+      {
+        deletingTrack && (
+          <div className="modal-overlay fade-in">
+            <div className="modal-container card dialog grow-out p-6 max-w-sm text-center">
+              <span className="material-symbols-outlined text-error mb-4" style={{ fontSize: '48px', color: '#ff5449' }}>warning</span>
+              <h3>Delete Track?</h3>
+              <p className="text-outline text-sm mb-6 leading-relaxed">
+                Are you sure you want to permanently delete <strong>{deletingTrack.title}</strong>?
+                This will remove the Firestore metadata and delete all associated audio/cover files from storage. This action is irreversible.
+              </p>
+              <div className="flex gap-4 justify-center">
+                <button
+                  type="button"
+                  className="btn outline"
+                  onClick={() => setDeletingTrack(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  style={{ backgroundColor: '#ff5449', borderColor: '#ff5449', color: 'white' }}
+                  onClick={handleDeleteConfirm}
+                >
+                  Permanently Delete
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
 

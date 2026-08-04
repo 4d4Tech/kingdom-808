@@ -3,7 +3,7 @@ import { db, auth } from '../firebase';
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 import { useAudio } from '../context/AudioProvider';
 
-const ArtistProfile = () => {
+const ArtistProfile = ({ userProfile, onOpenSettings }) => {
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const { playTrack, currentTrack, isPlaying } = useAudio();
@@ -43,7 +43,7 @@ const ArtistProfile = () => {
     const playerTrack = {
       id: track.id,
       title: track.title,
-      artist: 'Selah Grace',
+      artist: userProfile?.displayName || 'Selah Grace',
       album: track.genre || 'Single',
       img: track.artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=100",
       audioUrl: track.audioUrl
@@ -66,11 +66,17 @@ const ArtistProfile = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const heroStyle = userProfile?.heroUrl ? {
+    backgroundImage: `url(${userProfile.heroUrl})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center'
+  } : {};
+
   return (
     <div className="artist-profile fade-in">
       
       {/* Hero Section */}
-      <div className="artist-hero-desktop">
+      <div className="artist-hero-desktop" style={heroStyle}>
         <div className="hero-overlay"></div>
         <div className="artist-hero-content">
           <div className="flex items-center gap-2 text-primary font-bold tracking-wider text-xs mb-2">
@@ -78,9 +84,9 @@ const ArtistProfile = () => {
             VERIFIED ARTIST
           </div>
           
-          <h1>Selah Grace</h1>
+          <h1>{userProfile?.displayName || "Selah Grace"}</h1>
           <p className="italic text-outline mb-xl" style={{fontFamily: "'Playfair Display', serif", fontSize: '24px'}}>
-            Modern Worship & Ethereal Melodies
+            {userProfile?.tagline || "Modern Worship & Ethereal Melodies"}
           </p>
           
           <div className="flex gap-6 mb-xl">
@@ -94,7 +100,7 @@ const ArtistProfile = () => {
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             <button className="btn btn-primary btn-pill with-icon" style={{padding: '12px 32px'}} onClick={handlePlayRadio}>
               <span className="material-symbols-outlined fill-icon">
                 {currentTrack && isPlaying ? 'pause' : 'play_arrow'}
@@ -104,6 +110,16 @@ const ArtistProfile = () => {
             <button className="btn btn-pill outline" style={{padding: '12px 48px', borderColor: 'var(--color-outline)'}}>
               FOLLOW
             </button>
+            {onOpenSettings && (
+              <button 
+                className="btn btn-pill outline with-icon" 
+                style={{padding: '12px 28px', backgroundColor: 'var(--color-surface-container-lowest)'}}
+                onClick={onOpenSettings}
+              >
+                <span className="material-symbols-outlined">tune</span>
+                EDIT PROFILE
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -197,7 +213,7 @@ const ArtistProfile = () => {
           <div className="card mb-xl">
             <h3 className="mb-4">About the Artist</h3>
             <p className="text-sm text-outline" style={{lineHeight: '1.6'}}>
-              Selah Grace is a multi-award winning worship leader and songwriter known for her ethereal melodies. Born in Nashville and raised in the choral traditions of the South, she blends classical foundations with modern ambient sounds to create a sacred space for listening.
+              {userProfile?.bio || "Selah Grace is a multi-award winning worship leader and songwriter known for her ethereal melodies. Born in Nashville and raised in the choral traditions of the South, she blends classical foundations with modern ambient sounds to create a sacred space for listening."}
             </p>
             <div className="flex gap-4 mt-4 mb-xl">
               <button className="icon-btn-circle outline"><span className="material-symbols-outlined">public</span></button>
