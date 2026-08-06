@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db, auth, analytics } from '../firebase';
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, increment, collection, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, increment, collection, query, where, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { logEvent } from 'firebase/analytics';
 import { useAudio } from '../context/AudioProvider';
 
@@ -28,8 +28,8 @@ const PlaylistDetail = ({ user, onRequireAuth }) => {
 
   // Fetch uploaded tracks from Firestore
   useEffect(() => {
-    const tracksRef = collection(db, 'tracks');
-    const unsubscribe = onSnapshot(tracksRef, (snapshot) => {
+    const q = query(collection(db, 'tracks'), where('isPublic', '==', true));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       let trackList = snapshot.docs.map((d, index) => {
         const data = d.data();
         return {
@@ -333,13 +333,20 @@ const PlaylistDetail = ({ user, onRequireAuth }) => {
             return (
               <div
                 key={track.num}
-                className="table-row"
+                className="table-row track-card-with-bg"
                 onMouseEnter={() => setHoveredTrack(track.num)}
                 onMouseLeave={() => setHoveredTrack(null)}
                 onClick={() => handlePlayTrack(track)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: 'pointer', position: 'relative', overflow: 'hidden' }}
               >
-                <span className="text-outline text-sm flex items-center row-track-num-wrapper" style={{ minHeight: '20px' }}>
+                {/* Track Art Background Layers */}
+                <div 
+                  className="table-row-bg-image" 
+                  style={{ backgroundImage: `url(${track.img})` }}
+                />
+                <div className="table-row-bg-overlay" />
+
+                <span className="text-outline text-sm flex items-center row-track-num-wrapper" style={{ minHeight: '20px', zIndex: 2 }}>
                   {isCurrentPlaying ? (
                     <div className="equalizer">
                       <div className="equalizer-bar"></div>
@@ -355,8 +362,8 @@ const PlaylistDetail = ({ user, onRequireAuth }) => {
                   )}
                 </span>
 
-                <div className="flex items-center gap-4 row-title-info">
-                  <img src={track.img} alt={track.title} style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover' }} />
+                <div className="flex items-center gap-4 row-title-info" style={{ position: 'relative', zIndex: 2 }}>
+                  <img src={track.img} alt={track.title} style={{ width: '44px', height: '44px', borderRadius: '10px', objectFit: 'cover', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }} />
                   <div>
                     <h4 className="m-0 text-sm track-title-text" style={{ color: isCurrent ? 'var(--color-primary)' : 'inherit' }}>
                       {track.title}
@@ -364,10 +371,10 @@ const PlaylistDetail = ({ user, onRequireAuth }) => {
                     <p className="m-0 text-xs text-outline italic row-artist-name">{track.artist}</p>
                   </div>
                 </div>
-                <span className="text-outline text-sm row-album">{track.album}</span>
-                <span className="text-outline text-sm row-date">{track.date}</span>
+                <span className="text-outline text-sm row-album" style={{ position: 'relative', zIndex: 2 }}>{track.album}</span>
+                <span className="text-outline text-sm row-date" style={{ position: 'relative', zIndex: 2 }}>{track.date}</span>
 
-                <div className="row-actions-duration flex items-center justify-end gap-3">
+                <div className="row-actions-duration flex items-center justify-end gap-3" style={{ position: 'relative', zIndex: 2 }}>
                   <span className="text-outline text-sm row-duration">{track.time}</span>
 
                   <button

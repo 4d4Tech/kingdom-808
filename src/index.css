@@ -36,6 +36,16 @@
   --player-height: 90px;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root, .app-layout, .main-view, .page-content {
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
 body {
   background-color: var(--color-background);
   color: var(--color-on-surface);
@@ -973,12 +983,46 @@ p {
   grid-template-columns: 48px 2fr 1.5fr 1fr 100px;
   padding: 12px 16px;
   align-items: center;
-  border-radius: 8px;
-  transition: background 0.2s;
+  border-radius: 14px;
+  transition: background 0.2s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
 .table-row:hover {
   background: var(--color-surface-container);
+}
+
+/* Track Card Artwork Background Integration */
+.track-card-with-bg {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.table-row-bg-image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) scale(1.15);
+  opacity: 0.18;
+  z-index: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.table-row-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(253, 253, 253, 0.94) 0%, rgba(253, 253, 253, 0.82) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.table-row:hover .table-row-bg-image {
+  opacity: 0.35;
+  transform: scale(1.2);
 }
 
 .row-actions-duration {
@@ -1333,78 +1377,152 @@ p {
     height: 40px !important;
   }
 
-  .table-header {
-    display: none;
+  /* Mobile Card Reorganization for List View Items */
+  .table-header,
+  .table-header-row {
+    display: none !important;
   }
 
   .table-row {
     display: flex !important;
-    align-items: center;
-    padding: 12px 8px;
-    gap: 16px;
-    text-align: left;
+    flex-direction: column !important;
+    background: var(--color-surface-container-lowest) !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid var(--color-surface-container-high) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    text-align: left !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  }
+
+  .table-row:active {
+    transform: scale(0.99) !important;
   }
 
   .row-track-num-wrapper {
-    width: 24px;
-    flex-shrink: 0;
-    text-align: center;
+    display: none !important;
   }
 
   .row-title-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    min-width: 0;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    width: 100% !important;
   }
 
   .row-title-info>div {
-    min-width: 0;
-    flex: 1;
-    overflow: hidden;
+    min-width: 0 !important;
+    flex: 1 !important;
+    overflow: hidden !important;
   }
 
   .row-title-info img {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) !important;
   }
 
   .track-title-text {
-    font-size: 16px;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin: 0;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin: 0 0 2px 0 !important;
+    color: var(--color-on-surface) !important;
   }
 
   .row-artist-name {
-    display: none !important;
+    display: block !important;
+    font-size: 13px !important;
+    color: var(--color-primary) !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin: 0 !important;
   }
 
   .row-album,
-  .row-date,
-  .row-duration {
+  .row-date {
     display: none !important;
+  }
+
+  .row-duration {
+    display: inline-block !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    color: var(--color-outline) !important;
   }
 
   .row-actions-duration {
     display: flex !important;
-    align-items: center;
-    gap: 16px;
-    flex-shrink: 0;
-    margin-left: auto;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    padding-top: 10px !important;
+    border-top: 1px solid var(--color-surface-container) !important;
+    margin-left: 0 !important;
   }
 
   .row-heart-btn,
   .row-more-btn {
     display: flex !important;
     opacity: 1 !important;
-    color: var(--color-on-surface);
+    color: var(--color-on-surface) !important;
+    padding: 8px !important;
+    border-radius: 50% !important;
+    background: var(--color-surface-container-low) !important;
+  }
+
+  /* Creator Studio Track List Mobile Card Transformation */
+  .track-list-row {
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--color-surface-container-lowest) !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+    margin-bottom: 12px !important;
+    border: 1px solid var(--color-surface-container-high) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .track-list-row .col-info {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+  }
+
+  .track-list-row .col-genre,
+  .track-list-row .col-privacy,
+  .track-list-row .col-date,
+  .track-list-row .col-stats {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    font-size: 13px !important;
+  }
+
+  .track-list-row .col-actions {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    padding-top: 10px !important;
+    border-top: 1px solid var(--color-surface-container) !important;
   }
 
   .fullscreen-player-desktop {

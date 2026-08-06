@@ -10,9 +10,9 @@ const ArtistProfile = ({ userProfile, onOpenSettings }) => {
 
   useEffect(() => {
     // Fetch all public tracks uploaded by artists from Firestore
-    const tracksRef = collection(db, 'tracks');
+    const q = query(collection(db, 'tracks'), where('isPublic', '==', true));
 
-    const unsubscribe = onSnapshot(tracksRef, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       let trackList = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { useAudio } from '../context/AudioProvider';
 
 const ALL_GENRES = [
@@ -24,16 +24,16 @@ const Discover = () => {
   const { playTrack, currentTrack, isPlaying } = useAudio();
 
   useEffect(() => {
-    // Listen to real-time tracks collection from Firestore
-    const tracksRef = collection(db, 'tracks');
+    // Real-time query to fetch all public artist tracks from Firestore
+    const q = query(collection(db, 'tracks'), where('isPublic', '==', true));
 
-    const unsubscribe = onSnapshot(tracksRef, (snapshot) => {
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       let trackList = snapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
       }));
 
-      // Filter for public tracks (isPublic !== false)
+      // Filter public tracks for all visitors & listeners
       trackList = trackList.filter(t => t.isPublic !== false);
 
       // Client-side sorting by createdAt timestamp
@@ -126,10 +126,10 @@ const Discover = () => {
       <div className="mb-xl">
         <div className="flex justify-between items-baseline mb-4 flex-wrap gap-2">
           <h2 className="m-0">
-            {selectedGenreFilter === 'All' ? 'New Releases from Artists' : `Releases in ${selectedGenreFilter}`}
+            {selectedGenreFilter === 'All' ? 'Artist Public Song Catalog' : `Releases in ${selectedGenreFilter}`}
           </h2>
           <span className="text-primary text-xs font-bold uppercase tracking-wider">
-            {displayedTracks.length} {displayedTracks.length === 1 ? 'Track' : 'Tracks'} Available
+            {displayedTracks.length} {displayedTracks.length === 1 ? 'Track' : 'Tracks'} Available to Stream
           </span>
         </div>
 
@@ -155,11 +155,18 @@ const Discover = () => {
               return (
                 <div 
                   key={track.id} 
-                  className="card p-4 hover-elevate cursor-pointer flex-col gap-3"
+                  className="card p-4 hover-elevate cursor-pointer flex-col gap-3 track-card-with-bg"
                   onClick={() => handlePlayChartTrack(track)}
-                  style={{ borderRadius: '20px', transition: 'all 0.2s ease' }}
+                  style={{ borderRadius: '20px', transition: 'all 0.2s ease', position: 'relative', overflow: 'hidden' }}
                 >
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '1', borderRadius: '14px', overflow: 'hidden' }}>
+                  {/* Track Art Background Layers */}
+                  <div 
+                    className="table-row-bg-image" 
+                    style={{ backgroundImage: `url(${track.artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=400"})` }}
+                  />
+                  <div className="table-row-bg-overlay" />
+
+                  <div style={{ position: 'relative', zIndex: 2, width: '100%', aspectRatio: '1', borderRadius: '14px', overflow: 'hidden' }}>
                     <img 
                       src={track.artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=400"} 
                       alt={track.title} 
@@ -195,10 +202,10 @@ const Discover = () => {
                     </button>
                   </div>
 
-                  <div>
+                  <div style={{ position: 'relative', zIndex: 2 }}>
                     <h4 className="m-0 text-base font-bold truncate">{track.title}</h4>
                     <p className="text-xs text-outline m-0 mt-1 flex items-center justify-between">
-                      <span className="font-semibold text-primary">Brandon Robinson</span>
+                      <span className="font-semibold text-primary">{track.artist || track.artistName || 'Brandon Robinson'}</span>
                       <span className="badge outline text-xs" style={{ fontSize: '10px', padding: '2px 8px' }}>{track.genre || 'Worship'}</span>
                     </p>
                     {track.credits && (
@@ -232,7 +239,7 @@ const Discover = () => {
                   {heroTrack ? heroTrack.title : "Heaven on Earth"}
                 </h1>
                 <p className="text-white m-0" style={{ fontFamily: "'Geist', sans-serif", fontSize: '22px', fontWeight: 'bold', opacity: 0.9 }}>
-                  {heroTrack ? "Brandon Robinson" : "Divinity Collective"}
+                  {heroTrack ? (heroTrack.artist || "Brandon Robinson") : "Divinity Collective"}
                 </p>
               </div>
               <button 
@@ -252,21 +259,23 @@ const Discover = () => {
         <div className="right-col">
           <p className="text-xs text-primary font-bold uppercase tracking-wider mb-4">Fastest Climbers</p>
           <div className="flex-col gap-4">
-            {[
+            {(uploadedTracks.length > 1 ? uploadedTracks.slice(0, 3) : [
               { id: 'sacred-morning', rank: '02', title: 'Sacred Morning', artist: 'Zion Worship', img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=100' },
               { id: 'grace-flows', rank: '03', title: 'Grace Flows', artist: 'Elijah King', img: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&q=80&w=100' },
               { id: 'praise-rising', rank: '04', title: 'Praise Rising', artist: 'Kingdom Voices', img: 'https://images.unsplash.com/photo-1436891620584-47fd0e565afb?auto=format&fit=crop&q=80&w=100' }
-            ].map(item => (
+            ]).map((item, idx) => (
               <div 
-                key={item.rank} 
+                key={item.id || idx} 
                 className="fastest-climbers-card cursor-pointer"
                 onClick={() => handlePlayChartTrack(item)}
               >
-                <span className="font-headline text-surface-container-highest" style={{ fontSize: '32px', fontStyle: 'italic' }}>{item.rank}</span>
-                <img src={item.img} alt={item.title} style={{ width: '56px', height: '56px', borderRadius: '12px', objectFit: 'cover' }} />
+                <span className="font-headline text-surface-container-highest" style={{ fontSize: '32px', fontStyle: 'italic' }}>
+                  {String(idx + 2).padStart(2, '0')}
+                </span>
+                <img src={item.artworkUrl || item.img || "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=100"} alt={item.title} style={{ width: '56px', height: '56px', borderRadius: '12px', objectFit: 'cover' }} />
                 <div className="flex-1">
                   <h4 className="m-0 text-sm">{item.title}</h4>
-                  <p className="m-0 text-xs text-outline">{item.artist}</p>
+                  <p className="m-0 text-xs text-outline">{item.artist || 'Brandon Robinson'}</p>
                 </div>
                 <button type="button" className="icon-btn-circle outline small">
                   <span className="material-symbols-outlined text-sm">
@@ -340,7 +349,7 @@ const Discover = () => {
 
                   {hasUploads && matchingTracks[0] && (
                     <p className="text-xs italic text-primary-fixed-dim m-0 mb-3 truncate" style={{ color: 'rgba(255,255,255,0.95)' }}>
-                      Includes "{matchingTracks[0].title}" by Brandon Robinson
+                      Includes "{matchingTracks[0].title}" by {matchingTracks[0].artist || 'Brandon Robinson'}
                     </p>
                   )}
 
