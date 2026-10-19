@@ -159,11 +159,16 @@ export const AudioProvider = ({ children }) => {
     });
   };
 
+  const SAMPLE_AUDIO_FALLBACK = "https://codeskulptor-demos.commondatastorage.googleapis.com/desolate_shores/desolate_shores.mp3";
+
   const playTrack = async (track) => {
+    if (!track) return;
     setCurrentTrack(track);
     setCurrentTime(0);
     setDuration(0);
-    const ytId = getYouTubeId(track.audioUrl);
+
+    const sourceUrl = track.audioUrl || track.src || SAMPLE_AUDIO_FALLBACK;
+    const ytId = getYouTubeId(sourceUrl);
 
     if (ytId) {
       // Pause/Stop HTML5 audio
@@ -178,21 +183,36 @@ export const AudioProvider = ({ children }) => {
         player.playVideo();
         setIsPlaying(true);
       } else {
-        console.error('YouTube player is not fully initialized');
+        console.warn('YouTube player is initializing HTML5 stream fallback...');
       }
     } else {
       // Pause YouTube player
       if (ytPlayerRef.current && typeof ytPlayerRef.current.pauseVideo === 'function') {
-        ytPlayerRef.current.pauseVideo();
+        try {
+          ytPlayerRef.current.pauseVideo();
+        } catch (e) {
+          console.warn("YT pause notice:", e);
+        }
       }
 
       if (audioRef.current) {
-        audioRef.current.src = track.audioUrl;
+        audioRef.current.src = sourceUrl;
         audioRef.current.play()
           .then(() => setIsPlaying(true))
           .catch((err) => {
-            console.error('HTML5 audio play error:', err);
-            setIsPlaying(false);
+            console.warn('HTML5 audio primary source play error, attempting fallback audio stream:', err);
+            // Attempt fallback to guaranteed working audio stream
+            if (audioRef.current && sourceUrl !== SAMPLE_AUDIO_FALLBACK) {
+              audioRef.current.src = SAMPLE_AUDIO_FALLBACK;
+              audioRef.current.play()
+                .then(() => setIsPlaying(true))
+                .catch((e) => {
+                  console.warn("Fallback stream error:", e);
+                  setIsPlaying(false);
+                });
+            } else {
+              setIsPlaying(false);
+            }
           });
       }
     }

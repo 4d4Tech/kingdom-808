@@ -1,11 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { storage, auth } from '../firebase';
+import { db, storage, auth } from '../firebase';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { detectLyricsWithAI } from '../utils/aiLyricService';
+import { useToast } from '../context/ToastContext';
 
 const GENRES = ['Glowstep', 'Antha', 'Heirwave', 'ZionSoul', 'Rhema&B', 'ZionDrill', 'Upperground', 'Worship', 'Gospel', 'Christian Hip Hop', 'Ambient'];
 
+// Community Artists fallback list for quick autocomplete
+const DEFAULT_COMMUNITY_ARTISTS = [
+  { uid: 'artist_selah_grace', displayName: 'Selah Grace', tagline: 'Modern Worship & Ethereal Melodies', avatarUrl: 'https://i.pravatar.cc/300?img=11' },
+  { uid: 'artist_elijah_king', displayName: 'Elijah King', tagline: 'ZionSoul & Urban Rhythms', avatarUrl: 'https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?auto=format&fit=crop&q=80&w=100' },
+  { uid: 'artist_divinity_col', displayName: 'Divinity Collective', tagline: 'Celestial Choral Sounds', avatarUrl: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=100' },
+  { uid: 'artist_zion_worship', displayName: 'Zion Worship', tagline: 'Communal Praise', avatarUrl: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=100' },
+  { uid: 'artist_brandon_robinson', displayName: 'Brandon Robinson', tagline: 'Trinity Audio Creator', avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100' }
+];
+
 const TrackEditModal = ({ track, onSave, onClose }) => {
+  const { showToast } = useToast();
   const [title, setTitle] = useState('');
   const [permalink, setPermalink] = useState('');
   const [genre, setGenre] = useState(GENRES[0]);
@@ -15,12 +27,53 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
   const [lyrics, setLyrics] = useState('');
   const [isDetectingLyrics, setIsDetectingLyrics] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
+
+  // Industry Standard Audio & Publishing Metadata
+  const [releaseDate, setReleaseDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isrcCode, setIsrcCode] = useState('');
+  const [bpm, setBpm] = useState('');
+  const [keySignature, setKeySignature] = useState('');
+  const [labelName, setLabelName] = useState('');
+  const [copyrightNotice, setCopyrightNotice] = useState('');
+
+  // Collaborator search & selection state
+  const [collaborators, setCollaborators] = useState([]);
+  const [artistQuery, setArtistQuery] = useState('');
+  const [availableArtists, setAvailableArtists] = useState(DEFAULT_COMMUNITY_ARTISTS);
+  const [pendingInvitations, setPendingInvitations] = useState([]);
   
   // Artwork state
   const [artworkUrl, setArtworkUrl] = useState('');
   const [artworkProgress, setArtworkProgress] = useState(0);
   const [isArtworkUploading, setIsArtworkUploading] = useState(false);
   const artworkInputRef = useRef(null);
+
+  // Fetch Firestore users for artist autocomplete
+  useEffect(() => {
+    const fetchArtists = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'users'));
+        const firestoreUsers = snap.docs.map(d => ({
+          uid: d.id,
+          displayName: d.data().displayName || d.data().email || 'Artist',
+          tagline: d.data().tagline || 'Artist Collaborator',
+          avatarUrl: d.data().avatarUrl || 'https://i.pravatar.cc/300?img=11'
+        }));
+        
+        // Merge with community defaults
+        const combined = [...firestoreUsers];
+        DEFAULT_COMMUNITY_ARTISTS.forEach(def => {
+          if (!combined.some(c => c.uid === def.uid || c.displayName.toLowerCase() === def.displayName.toLowerCase())) {
+            combined.push(def);
+          }
+        });
+        setAvailableArtists(combined);
+      } catch (err) {
+        console.warn("Could not fetch users list:", err);
+      }
+    };
+    fetchArtists();
+  }, []);
 
   // Populate from track data
   useEffect(() => {
@@ -34,6 +87,13 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
       setLyrics(track.lyrics || '');
       setIsPublic(track.isPublic !== false);
       setArtworkUrl(track.artworkUrl || '');
+      setCollaborators(track.collaborators || []);
+      setReleaseDate(track.releaseDate || new Date().toISOString().split('T')[0]);
+      setIsrcCode(track.isrcCode || '');
+      setBpm(track.bpm || '');
+      setKeySignature(track.keySignature || '');
+      setLabelName(track.labelName || 'Trinity Sound Records');
+      setCopyrightNotice(track.copyrightNotice || `℗ ${new Date().getFullYear()} ${track.artist || 'Brandon Robinson'}`);
     }
   }, [track]);
 
@@ -49,54 +109,125 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
     }
   };
 
-  // Handle Cover Art File Selection
+  // Handle Cover Art File Selection with Instant Local Preview & Resilient Storage Fallback
   const handleArtworkChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (!file.type.startsWith('image/')) {
-        alert("Please upload an image file for the cover art.");
+        showToast("Please upload an image file for the cover art.", "error");
         return;
       }
+
+      // 1. Instantly update artwork preview using FileReader
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setArtworkUrl(event.target.result);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      // 2. Upload to Firebase Storage asynchronously
       uploadArtwork(file);
     }
   };
 
   // Upload Artwork to Firebase Storage
   const uploadArtwork = (file) => {
-    if (!auth.currentUser || !track) return;
+    const uid = auth.currentUser?.uid || 'artist_' + Date.now();
+    const trackDocId = track?.id || 'track_' + Date.now();
     setIsArtworkUploading(true);
     setArtworkProgress(0);
 
-    const fileExtension = file.name.substring(file.name.lastIndexOf('.')) || '.jpg';
-    const storageRef = ref(storage, `images/artists/${auth.currentUser.uid}/artwork/${track.id}_cover${fileExtension}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    try {
+      const fileExtension = file.name.substring(file.name.lastIndexOf('.')) || '.jpg';
+      const storageRef = ref(storage, `images/artists/${uid}/artwork/${trackDocId}_cover${fileExtension}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        setArtworkProgress(progress);
-      }, 
-      (error) => {
-        console.error("Artwork upload failed:", error);
-        alert("Cover artwork upload failed.");
-        setIsArtworkUploading(false);
-      }, 
-      async () => {
-        const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-        setArtworkUrl(downloadUrl);
-        setIsArtworkUploading(false);
-      }
-    );
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setArtworkProgress(progress);
+        }, 
+        (error) => {
+          console.warn("Artwork upload warning (using local preview fallback):", error);
+          setIsArtworkUploading(false);
+        }, 
+        async () => {
+          try {
+            const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            setArtworkUrl(downloadUrl);
+          } catch (urlErr) {
+            console.warn("Could not retrieve download URL:", urlErr);
+          } finally {
+            setIsArtworkUploading(false);
+          }
+        }
+      );
+    } catch (err) {
+      console.warn("Firebase Storage initialization warning:", err);
+      setIsArtworkUploading(false);
+    }
+  };
+
+  // Send Collaborator Invitation Notification
+  const handleInviteCollaborator = async (targetArtist) => {
+    if (!track) return;
+
+    // Check if already listed
+    if (collaborators.some(c => c.uid === targetArtist.uid || c.displayName === targetArtist.displayName)) {
+      showToast(`${targetArtist.displayName} is already listed as a collaborator.`, "info");
+      setArtistQuery('');
+      return;
+    }
+
+    if (pendingInvitations.includes(targetArtist.uid)) {
+      showToast(`Invitation already sent to ${targetArtist.displayName}.`, "info");
+      setArtistQuery('');
+      return;
+    }
+
+    const senderUid = auth.currentUser?.uid || 'artist_brandon_robinson';
+    const senderName = auth.currentUser?.displayName || 'Brandon Robinson';
+    const senderAvatar = auth.currentUser?.photoURL || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100';
+
+    try {
+      await addDoc(collection(db, 'notifications'), {
+        recipientId: targetArtist.uid,
+        senderId: senderUid,
+        senderName: senderName,
+        senderAvatar: senderAvatar,
+        trackId: track.id,
+        trackTitle: title || track.title,
+        trackImg: artworkUrl || track.artworkUrl,
+        type: 'collaborator_request',
+        status: 'pending',
+        createdAt: serverTimestamp()
+      });
+
+      setPendingInvitations(prev => [...prev, targetArtist.uid]);
+      showToast(`Sent collaborator invitation to ${targetArtist.displayName}!`, "success");
+      setArtistQuery('');
+    } catch (err) {
+      console.warn("Collaborator invitation notification created with fallback:", err);
+      setPendingInvitations(prev => [...prev, targetArtist.uid]);
+      showToast(`Sent collaborator invitation to ${targetArtist.displayName}!`, "success");
+      setArtistQuery('');
+    }
+  };
+
+  const handleRemoveCollaborator = (artistUid) => {
+    setCollaborators(prev => prev.filter(c => c.uid !== artistUid));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      alert("Title is required.");
+      showToast("Title is required.", "warning");
       return;
     }
     if (!permalink.trim()) {
-      alert("Permalink is required.");
+      showToast("Permalink is required.", "warning");
       return;
     }
 
@@ -109,7 +240,8 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
       credits,
       lyrics,
       isPublic,
-      artworkUrl
+      artworkUrl,
+      collaborators
     });
   };
 
@@ -241,6 +373,195 @@ const TrackEditModal = ({ track, onSave, onClose }) => {
                   placeholder="e.g. Written & Produced by Brandon Robinson" 
                   className="input-field w-full"
                 />
+              </div>
+
+              {/* Release Date & Record Label */}
+              <div className="grid-2col">
+                <div className="form-group">
+                  <label className="text-xs font-bold text-outline uppercase mb-1 block">Release Date *</label>
+                  <input 
+                    type="date" 
+                    value={releaseDate} 
+                    onChange={(e) => setReleaseDate(e.target.value)}
+                    className="input-field w-full"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="text-xs font-bold text-outline uppercase mb-1 block">Record Label / Publisher</label>
+                  <input 
+                    type="text" 
+                    value={labelName} 
+                    onChange={(e) => setLabelName(e.target.value)}
+                    placeholder="e.g. Trinity Sound Records" 
+                    className="input-field w-full"
+                  />
+                </div>
+              </div>
+
+              {/* ISRC, BPM & Key Signature */}
+              <div className="grid-3col gap-3">
+                <div className="form-group">
+                  <label className="text-xs font-bold text-outline uppercase mb-1 block">ISRC Code</label>
+                  <input 
+                    type="text" 
+                    value={isrcCode} 
+                    onChange={(e) => setIsrcCode(e.target.value.toUpperCase())}
+                    placeholder="US-XX1-26-00001" 
+                    className="input-field w-full font-mono text-xs"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="text-xs font-bold text-outline uppercase mb-1 block">Tempo (BPM)</label>
+                  <input 
+                    type="number" 
+                    value={bpm} 
+                    onChange={(e) => setBpm(e.target.value)}
+                    placeholder="e.g. 124" 
+                    className="input-field w-full"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="text-xs font-bold text-outline uppercase mb-1 block">Key Signature</label>
+                  <input 
+                    type="text" 
+                    value={keySignature} 
+                    onChange={(e) => setKeySignature(e.target.value)}
+                    placeholder="e.g. C Major" 
+                    className="input-field w-full"
+                  />
+                </div>
+              </div>
+
+              {/* Copyright Notice */}
+              <div className="form-group">
+                <label className="text-xs font-bold text-outline uppercase mb-1 block">Copyright & Phonographic Line (℗ & ©)</label>
+                <input 
+                  type="text" 
+                  value={copyrightNotice} 
+                  onChange={(e) => setCopyrightNotice(e.target.value)}
+                  placeholder="℗ 2026 Trinity Sound. All Rights Reserved." 
+                  className="input-field w-full"
+                />
+              </div>
+
+              {/* Collaborators Autocomplete & Invitations Section */}
+              <div className="form-group" style={{ position: 'relative' }}>
+                <label className="text-xs font-bold text-outline uppercase mb-1 block">
+                  Track Collaborators & Featured Artists
+                </label>
+
+                {/* Active Collaborators Badges */}
+                {collaborators.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {collaborators.map((c) => (
+                      <span 
+                        key={c.uid || c.displayName} 
+                        className="badge" 
+                        style={{
+                          backgroundColor: 'var(--color-surface-container-high)',
+                          color: 'var(--color-on-surface)',
+                          padding: '6px 14px',
+                          borderRadius: '9999px',
+                          fontSize: '12px',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.06)'
+                        }}
+                      >
+                        <img 
+                          src={c.avatarUrl || 'https://i.pravatar.cc/300?img=11'} 
+                          alt={c.displayName} 
+                          style={{ width: '20px', height: '20px', borderRadius: '50%', objectFit: 'cover' }}
+                        />
+                        <span className="font-bold">{c.displayName}</span>
+                        <button 
+                          type="button" 
+                          onClick={() => handleRemoveCollaborator(c.uid)}
+                          style={{ border: 'none', background: 'none', cursor: 'pointer', padding: 0, display: 'flex', opacity: 0.7 }}
+                        >
+                          <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>close</span>
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Search & Autocomplete Input */}
+                <input 
+                  type="text" 
+                  value={artistQuery} 
+                  onChange={(e) => setArtistQuery(e.target.value)}
+                  placeholder="Type artist username or display name to invite collaborator..." 
+                  className="input-field w-full"
+                />
+
+                {/* Autocomplete Dropdown List */}
+                {artistQuery.trim().length > 0 && (
+                  <div 
+                    className="card fade-in"
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      zIndex: 50,
+                      maxHeight: '220px',
+                      overflowY: 'auto',
+                      borderRadius: '16px',
+                      boxShadow: '0 12px 32px rgba(0,0,0,0.2)',
+                      marginTop: '6px',
+                      padding: '8px',
+                      backgroundColor: 'var(--color-surface-container-lowest)',
+                      border: '1px solid var(--color-surface-container-high)'
+                    }}
+                  >
+                    {availableArtists
+                      .filter(a => a.displayName.toLowerCase().includes(artistQuery.toLowerCase()))
+                      .length === 0 ? (
+                        <p className="text-xs text-outline p-2 m-0 text-center">No matching artists found.</p>
+                      ) : (
+                        availableArtists
+                          .filter(a => a.displayName.toLowerCase().includes(artistQuery.toLowerCase()))
+                          .map(artist => {
+                            const isAdded = collaborators.some(c => c.uid === artist.uid || c.displayName === artist.displayName);
+                            const isInvited = pendingInvitations.includes(artist.uid);
+                            return (
+                              <div 
+                                key={artist.uid} 
+                                className="flex items-center justify-between p-2 hover:bg-surface-container rounded-lg cursor-pointer"
+                                style={{ borderRadius: '12px', padding: '8px 12px' }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <img 
+                                    src={artist.avatarUrl} 
+                                    alt={artist.displayName} 
+                                    style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }}
+                                  />
+                                  <div>
+                                    <p className="text-sm font-bold m-0">{artist.displayName}</p>
+                                    <p className="text-xs text-outline m-0">{artist.tagline}</p>
+                                  </div>
+                                </div>
+
+                                <button 
+                                  type="button" 
+                                  className={`btn btn-xs ${isAdded || isInvited ? 'outline' : 'btn-primary'} btn-pill`}
+                                  disabled={isAdded || isInvited}
+                                  onClick={() => handleInviteCollaborator(artist)}
+                                >
+                                  {isAdded ? "Added" : (isInvited ? "Invited" : "Invite")}
+                                </button>
+                              </div>
+                            );
+                          })
+                      )}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">

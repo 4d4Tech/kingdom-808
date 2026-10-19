@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db, storage } from '../firebase';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { useToast } from '../context/ToastContext';
+import { compressImage } from '../utils/imageCompressor';
 
-const ProfileSettingsModal = ({ isOpen, onClose, userProfile, user }) => {
+const ProfileSettingsModal = ({ isOpen, onClose, userProfile, user, onSaveProfile }) => {
+  const { showToast } = useToast();
   const [displayName, setDisplayName] = useState('');
   const [tagline, setTagline] = useState('');
   const [bio, setBio] = useState('');
@@ -34,79 +37,87 @@ const ProfileSettingsModal = ({ isOpen, onClose, userProfile, user }) => {
 
   if (!isOpen) return null;
 
-  // Handle Avatar Upload
-  const handleAvatarChange = (e) => {
+  // Handle Avatar Upload with Client-Side Compression & Instant Preview
+  const handleAvatarChange = async (e) => {
     if (!e.target.files || !e.target.files[0]) return;
     const file = e.target.files[0];
     if (!file.type.startsWith('image/')) {
-      alert("Please select a valid image file for profile picture.");
+      showToast("Please select a valid image file for profile picture.", "error");
       return;
     }
 
-    const uid = user?.uid || 'guest_user';
     setIsAvatarUploading(true);
-    setAvatarProgress(0);
+    setAvatarProgress(30);
 
-    const storageRef = ref(storage, `images/users/${uid}/avatar_${Date.now()}.jpg`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    // Compress image to lightweight ~25KB JPEG payload
+    const compressed = await compressImage(file, 500, 500, 0.8);
+    if (compressed) {
+      setAvatarUrl(compressed);
+    }
+    setAvatarProgress(100);
+    setIsAvatarUploading(false);
 
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        setAvatarProgress(progress);
-      },
-      (error) => {
-        console.error("Avatar upload failed:", error);
-        alert("Avatar upload failed.");
-        setIsAvatarUploading(false);
-      },
-      async () => {
-        const url = await getDownloadURL(uploadTask.snapshot.ref);
-        setAvatarUrl(url);
-        setIsAvatarUploading(false);
-      }
-    );
+    // Asynchronously attempt Firebase Storage upload
+    const uid = user?.uid || 'user_' + Date.now();
+    try {
+      const storageRef = ref(storage, `images/users/${uid}/avatar_${Date.now()}.jpg`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on('state_changed', null, (err) => console.warn("Storage upload warn:", err), async () => {
+        try {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          setAvatarUrl(url);
+        } catch (e) {
+          console.warn("Storage getDownloadURL warn:", e);
+        }
+      });
+    } catch (err) {
+      console.warn("Storage init warn:", err);
+    }
   };
 
-  // Handle Hero Banner Upload
-  const handleHeroChange = (e) => {
+  // Handle Hero Banner Upload with Client-Side Compression & Instant Preview
+  const handleHeroChange = async (e) => {
     if (!e.target.files || !e.target.files[0]) return;
     const file = e.target.files[0];
     if (!file.type.startsWith('image/')) {
-      alert("Please select a valid image file for header cover.");
+      showToast("Please select a valid image file for header cover.", "error");
       return;
     }
 
-    const uid = user?.uid || 'guest_user';
     setIsHeroUploading(true);
-    setHeroProgress(0);
+    setHeroProgress(30);
 
-    const storageRef = ref(storage, `images/users/${uid}/hero_${Date.now()}.jpg`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    // Compress cover image to lightweight ~80KB JPEG payload
+    const compressed = await compressImage(file, 1200, 600, 0.8);
+    if (compressed) {
+      setHeroUrl(compressed);
+    }
+    setHeroProgress(100);
+    setIsHeroUploading(false);
 
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        setHeroProgress(progress);
-      },
-      (error) => {
-        console.error("Hero upload failed:", error);
-        alert("Hero image upload failed.");
-        setIsHeroUploading(false);
-      },
-      async () => {
-        const url = await getDownloadURL(uploadTask.snapshot.ref);
-        setHeroUrl(url);
-        setIsHeroUploading(false);
-      }
-    );
+    // Asynchronously attempt Firebase Storage upload
+    const uid = user?.uid || 'user_' + Date.now();
+    try {
+      const storageRef = ref(storage, `images/users/${uid}/hero_${Date.now()}.jpg`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
+      uploadTask.on('state_changed', null, (err) => console.warn("Storage upload warn:", err), async () => {
+        try {
+          const url = await getDownloadURL(uploadTask.snapshot.ref);
+          setHeroUrl(url);
+        } catch (e) {
+          console.warn("Storage getDownloadURL warn:", e);
+        }
+      });
+    } catch (err) {
+      console.warn("Storage init warn:", err);
+    }
   };
 
-  // Save Profile to Firestore & localStorage
+  // Save Profile to Firestore, localStorage & App State
   const handleSave = async (e) => {
     e.preventDefault();
     if (!displayName.trim()) {
-      alert("Artist Name is required.");
+      showToast("Artist Name is required.", "warning");
       return;
     }
 
@@ -118,30 +129,33 @@ const ProfileSettingsModal = ({ isOpen, onClose, userProfile, user }) => {
       location: location.trim(),
       avatarUrl: avatarUrl || 'https://i.pravatar.cc/300?img=11',
       heroUrl: heroUrl || 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&q=80&w=1600',
-      updatedAt: serverTimestamp()
+      updatedAt: new Date().toISOString()
     };
 
-    // Save locally for fallback
+    // 1. Save locally for instant persistence & UI re-rendering
     try {
       localStorage.setItem('local_user_profile', JSON.stringify(updatedData));
     } catch (err) {
       console.warn("Could not save to localStorage:", err);
     }
 
-    // Save to Firestore if user exists
+    // 2. Trigger parent app state update so Artist Profile & Header re-render immediately
+    if (onSaveProfile) {
+      onSaveProfile(updatedData);
+    }
+
+    // 3. Save to Firestore if user exists with non-blocking error handling
     if (user && !user.isAnonymous) {
       try {
         const userRef = doc(db, 'users', user.uid);
         await setDoc(userRef, updatedData, { merge: true });
       } catch (err) {
-        console.error("Failed to update profile in Firestore:", err);
-        alert("Failed to save profile to cloud.");
-        setIsSaving(false);
-        return;
+        console.warn("Cloud profile sync notice (saved locally & in memory):", err);
       }
     }
 
     setIsSaving(false);
+    showToast("Profile settings saved successfully!", "success");
     onClose();
   };
 

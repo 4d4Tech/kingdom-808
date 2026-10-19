@@ -3,9 +3,11 @@ import { db, auth, analytics } from '../firebase';
 import { doc, getDoc, setDoc, updateDoc, deleteDoc, increment, collection, query, where, onSnapshot, addDoc, serverTimestamp } from 'firebase/firestore';
 import { logEvent } from 'firebase/analytics';
 import { useAudio } from '../context/AudioProvider';
+import { useToast } from '../context/ToastContext';
 
 const PlaylistDetail = ({ user, onRequireAuth }) => {
   const { isPlaying, currentTrack, playTrack } = useAudio();
+  const { showToast } = useToast();
 
   const playlistId = 'morning_worship';
   const [followerCount, setFollowerCount] = useState(12402);
@@ -234,7 +236,7 @@ const PlaylistDetail = ({ user, onRequireAuth }) => {
   const handleCopyLink = () => {
     const link = `${window.location.origin}/?view=playlist&id=${playlistId}`;
     navigator.clipboard.writeText(link).then(() => {
-      alert('Playlist link copied to clipboard!');
+      showToast('Playlist link copied to clipboard!', 'success');
       setShowShareModal(false);
       if (analytics) {
         logEvent(analytics, 'share', { method: 'copy_link', content_type: 'playlist', item_id: playlistId });
@@ -298,11 +300,11 @@ const PlaylistDetail = ({ user, onRequireAuth }) => {
               </button>
               {showMoreMenu && (
                 <div className="more-dropdown" style={{ right: 0, top: '56px' }}>
-                  <div className="dropdown-item" onClick={() => { setShowMoreMenu(false); alert('Added to Queue'); }}>
+                  <div className="dropdown-item" onClick={() => { setShowMoreMenu(false); showToast('Added to Queue', 'success'); }}>
                     <span className="material-symbols-outlined">queue_music</span>
                     Add to Queue
                   </div>
-                  <div className="dropdown-item" onClick={() => { setShowMoreMenu(false); alert('Reported Playlist'); }}>
+                  <div className="dropdown-item" onClick={() => { setShowMoreMenu(false); showToast('Playlist reported to moderation team', 'info'); }}>
                     <span className="material-symbols-outlined">report</span>
                     Report Playlist
                   </div>
@@ -368,7 +370,12 @@ const PlaylistDetail = ({ user, onRequireAuth }) => {
                     <h4 className="m-0 text-sm track-title-text" style={{ color: isCurrent ? 'var(--color-primary)' : 'inherit' }}>
                       {track.title}
                     </h4>
-                    <p className="m-0 text-xs text-outline italic row-artist-name">{track.artist}</p>
+                    <p className="m-0 text-xs text-outline italic row-artist-name">
+                      {track.artist}
+                      {Array.isArray(track.collaborators) && track.collaborators.length > 0 && (
+                        <span>{' ft. ' + track.collaborators.map(c => c.displayName).join(', ')}</span>
+                      )}
+                    </p>
                   </div>
                 </div>
                 <span className="text-outline text-sm row-album" style={{ position: 'relative', zIndex: 2 }}>{track.album}</span>
@@ -447,11 +454,11 @@ const PlaylistDetail = ({ user, onRequireAuth }) => {
                 <span className="material-symbols-outlined">link</span>
                 <span>Copy Link</span>
               </div>
-              <div className="share-item" style={{ animationDelay: '0.2s' }} onClick={() => { alert('Shared on Twitter!'); setShowShareModal(false); }}>
+              <div className="share-item" style={{ animationDelay: '0.2s' }} onClick={() => { showToast('Shared on Twitter / X!', 'success'); setShowShareModal(false); }}>
                 <span className="material-symbols-outlined font-normal">chat</span>
                 <span>Twitter / X</span>
               </div>
-              <div className="share-item" style={{ animationDelay: '0.3s' }} onClick={() => { alert('Shared on Facebook!'); setShowShareModal(false); }}>
+              <div className="share-item" style={{ animationDelay: '0.3s' }} onClick={() => { showToast('Shared on Facebook!', 'success'); setShowShareModal(false); }}>
                 <span className="material-symbols-outlined">share</span>
                 <span>Facebook</span>
               </div>

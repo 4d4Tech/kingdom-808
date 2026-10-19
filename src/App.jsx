@@ -5,6 +5,7 @@ import GlobalPlayer from './components/GlobalPlayer';
 import { onAuthStateChanged, signInAnonymously } from 'firebase/auth';
 import { auth, db } from './firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
+import NotificationCenter from './components/NotificationCenter';
 
 // Pages
 import ArtistProfile from './pages/ArtistProfile';
@@ -36,6 +37,14 @@ function App() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const handleSignOut = () => {
+    localStorage.removeItem('local_user_profile');
+    setUserProfile({
+      displayName: 'Guest',
+      tagline: 'Guest Listener',
+      avatarUrl: 'https://i.pravatar.cc/100?img=9',
+      isArtist: false,
+      isAnonymous: true
+    });
     auth.signOut().then(() => {
       setCurrentView('discover');
       setShowProfileMenu(false);
@@ -66,20 +75,24 @@ function App() {
 
   useEffect(() => {
     if (!user) {
-      setUserProfile(null);
+      setUserProfile({
+        displayName: 'Guest',
+        tagline: 'Guest Listener',
+        avatarUrl: 'https://i.pravatar.cc/100?img=9',
+        isArtist: false,
+        isAnonymous: true
+      });
       return;
     }
 
-    const storedLocal = localStorage.getItem('local_user_profile');
-    const parsedLocal = storedLocal ? JSON.parse(storedLocal) : null;
     const isBrandon = Boolean(user.email && user.email.toLowerCase() === 'brandonrobinson81@gmail.com');
 
     if (user.isAnonymous && !isBrandon) {
-      setUserProfile(parsedLocal || { 
-        displayName: 'Selah Grace', 
-        tagline: 'Modern Worship & Ethereal Melodies',
-        bio: 'Selah Grace is a multi-award winning worship leader and songwriter known for her ethereal melodies.',
-        avatarUrl: 'https://i.pravatar.cc/300?img=11',
+      setUserProfile({ 
+        displayName: 'Guest', 
+        tagline: 'Guest Listener',
+        bio: 'Welcome to TrinitySound. Listen to worship tracks and ethereal melodies.',
+        avatarUrl: 'https://i.pravatar.cc/100?img=9',
         isArtist: false,
         isAnonymous: true 
       });
@@ -259,7 +272,7 @@ function App() {
                   </button>
                 )}
 
-                <button className="icon-btn hidden-mobile"><span className="material-symbols-outlined">notifications</span></button>
+                <NotificationCenter user={user} />
                 <button className="icon-btn hidden-mobile"><span className="material-symbols-outlined">favorite_border</span></button>
                 
                 <div className="profile-chip-container" style={{ position: 'relative' }}>
@@ -366,6 +379,12 @@ function App() {
           onClose={() => setIsProfileSettingsOpen(false)}
           userProfile={userProfile}
           user={user}
+          onSaveProfile={(updatedData) => {
+            setUserProfile(prev => ({
+              ...(prev || {}),
+              ...updatedData
+            }));
+          }}
         />
 
       </div>

@@ -3,6 +3,7 @@ import { db, storage, auth } from '../firebase';
 import { collection, query, where, orderBy, onSnapshot, doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 import { useAudio } from '../context/AudioProvider';
+import { useToast } from '../context/ToastContext';
 
 // Subcomponents
 import UploadDropzone from '../components/UploadDropzone';
@@ -11,6 +12,7 @@ import DashboardTrackList from '../components/DashboardTrackList';
 import TrackEditModal from '../components/TrackEditModal';
 
 const Dashboard = ({ userProfile }) => {
+  const { showToast } = useToast();
   const [subView, setSubView] = useState('library'); // 'library' or 'upload'
   const [tracks, setTracks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -101,7 +103,7 @@ const Dashboard = ({ userProfile }) => {
       },
       (error) => {
         console.error("Audio upload failed:", error);
-        alert("Audio upload failed.");
+        showToast("Audio upload failed.", "error");
         resetUploadState();
         setSubView('library');
       },
@@ -170,12 +172,12 @@ const Dashboard = ({ userProfile }) => {
         updatedAt: serverTimestamp()
       });
 
-      alert("Track saved and published successfully!");
+      showToast("Track saved and published successfully!", "success");
       resetUploadState();
       setSubView('library');
     } catch (err) {
       console.error("Failed to save track document:", err);
-      alert("Failed to save track details.");
+      showToast("Failed to save track details.", "error");
     }
   };
 
@@ -187,11 +189,11 @@ const Dashboard = ({ userProfile }) => {
         ...updatedFields,
         updatedAt: serverTimestamp()
       });
-      alert("Track updated successfully.");
+      showToast("Track updated successfully.", "success");
       setEditingTrack(null);
     } catch (err) {
       console.error("Failed to update track:", err);
-      alert("Failed to update track.");
+      showToast("Failed to update track.", "error");
     }
   };
 
@@ -223,11 +225,11 @@ const Dashboard = ({ userProfile }) => {
         }
       }
 
-      alert("Track and files deleted successfully.");
+      showToast("Track and files deleted successfully.", "info");
       setDeletingTrack(null);
     } catch (err) {
       console.error("Deletion failed:", err);
-      alert("Failed to complete track deletion.");
+      showToast("Failed to complete track deletion.", "error");
     }
   };
 
@@ -249,7 +251,7 @@ const Dashboard = ({ userProfile }) => {
   const handleShareTrack = (track) => {
     const link = `${window.location.origin}/?view=artist&track=${track.permalink || track.id}`;
     navigator.clipboard.writeText(link).then(() => {
-      alert("Track share link copied to clipboard!");
+      showToast("Track share link copied to clipboard!", "success");
     }).catch(err => {
       console.error("Could not copy text: ", err);
     });

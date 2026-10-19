@@ -2,10 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { storage, auth } from '../firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { detectLyricsWithAI } from '../utils/aiLyricService';
+import { useToast } from '../context/ToastContext';
 
 const GENRES = ['Glowstep', 'Antha', 'Heirwave', 'ZionSoul', 'Rhema&B', 'ZionDrill', 'Upperground', 'Worship', 'Gospel', 'Christian Hip Hop', 'Ambient'];
 
 const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudioUploading, onSave, onCancel }) => {
+  const { showToast } = useToast();
   const [title, setTitle] = useState('');
   const [permalink, setPermalink] = useState('');
   const [genre, setGenre] = useState(GENRES[0]);
@@ -15,6 +17,14 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
   const [lyrics, setLyrics] = useState('');
   const [isDetectingLyrics, setIsDetectingLyrics] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
+
+  // Audio & Publishing Metadata
+  const [releaseDate, setReleaseDate] = useState(new Date().toISOString().split('T')[0]);
+  const [isrcCode, setIsrcCode] = useState('');
+  const [bpm, setBpm] = useState('');
+  const [keySignature, setKeySignature] = useState('');
+  const [labelName, setLabelName] = useState('');
+  const [copyrightNotice, setCopyrightNotice] = useState('');
 
   // Artwork state
   const [artworkFile, setArtworkFile] = useState(null);
@@ -57,55 +67,74 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
     }
   };
 
-  // Handle Cover Art File Selection
+  // Handle Cover Art File Selection with Instant Local Preview & Resilient Storage Fallback
   const handleArtworkChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (!file.type.startsWith('image/')) {
-        alert("Please upload an image file for the cover art.");
+        showToast("Please upload an image file for the cover art.", "error");
         return;
       }
       setArtworkFile(file);
+
+      // 1. Instantly update artwork preview using FileReader
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        if (event.target?.result) {
+          setArtworkUrl(event.target.result);
+        }
+      };
+      reader.readAsDataURL(file);
+
+      // 2. Upload to Firebase Storage asynchronously
       uploadArtwork(file);
     }
   };
 
-  // Upload Artwork to Firebase Storage
   const uploadArtwork = (file) => {
-    if (!auth.currentUser) return;
+    const uid = auth.currentUser?.uid || 'artist_' + Date.now();
     setIsArtworkUploading(true);
     setArtworkProgress(0);
 
-    const fileExtension = file.name.substring(file.name.lastIndexOf('.')) || '.jpg';
-    const storageRef = ref(storage, `images/artists/${auth.currentUser.uid}/artwork/${trackId}_cover${fileExtension}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    try {
+      const fileExtension = file.name.substring(file.name.lastIndexOf('.')) || '.jpg';
+      const storageRef = ref(storage, `images/artists/${uid}/artwork/${trackId}_cover${fileExtension}`);
+      const uploadTask = uploadBytesResumable(storageRef, file);
 
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        setArtworkProgress(progress);
-      }, 
-      (error) => {
-        console.error("Artwork upload failed:", error);
-        alert("Cover artwork upload failed.");
-        setIsArtworkUploading(false);
-      }, 
-      async () => {
-        const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
-        setArtworkUrl(downloadUrl);
-        setIsArtworkUploading(false);
-      }
-    );
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setArtworkProgress(progress);
+        }, 
+        (error) => {
+          console.warn("Artwork storage upload warning (using local preview fallback):", error);
+          setIsArtworkUploading(false);
+        }, 
+        async () => {
+          try {
+            const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            setArtworkUrl(downloadUrl);
+          } catch (urlErr) {
+            console.warn("Could not retrieve artwork download URL:", urlErr);
+          } finally {
+            setIsArtworkUploading(false);
+          }
+        }
+      );
+    } catch (err) {
+      console.warn("Firebase Storage initialization warning:", err);
+      setIsArtworkUploading(false);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      alert("Title is required.");
+      showToast("Title is required.", "warning");
       return;
     }
     if (!permalink.trim()) {
-      alert("Permalink is required.");
+      showToast("Permalink is required.", "warning");
       return;
     }
 
@@ -118,7 +147,13 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
       credits,
       lyrics,
       isPublic,
-      artworkUrl: artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=300" // default fallback
+      artworkUrl: artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=300",
+      releaseDate,
+      isrcCode,
+      bpm,
+      keySignature,
+      labelName,
+      copyrightNotice
     });
   };
 
@@ -256,6 +291,79 @@ const TrackMetadataForm = ({ trackId, audioFileName, audioUploadProgress, isAudi
               value={credits} 
               onChange={(e) => setCredits(e.target.value)}
               placeholder="e.g. Written & Produced by Brandon Robinson" 
+              className="input-field w-full"
+            />
+          </div>
+
+          {/* Release Date & Record Label */}
+          <div className="grid-2col">
+            <div className="form-group">
+              <label className="text-xs font-bold text-outline uppercase mb-1 block">Release Date *</label>
+              <input 
+                type="date" 
+                value={releaseDate} 
+                onChange={(e) => setReleaseDate(e.target.value)}
+                className="input-field w-full"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="text-xs font-bold text-outline uppercase mb-1 block">Record Label / Publisher</label>
+              <input 
+                type="text" 
+                value={labelName} 
+                onChange={(e) => setLabelName(e.target.value)}
+                placeholder="e.g. Trinity Sound Records" 
+                className="input-field w-full"
+              />
+            </div>
+          </div>
+
+          {/* ISRC, BPM & Key Signature */}
+          <div className="grid-3col gap-3">
+            <div className="form-group">
+              <label className="text-xs font-bold text-outline uppercase mb-1 block">ISRC Code</label>
+              <input 
+                type="text" 
+                value={isrcCode} 
+                onChange={(e) => setIsrcCode(e.target.value.toUpperCase())}
+                placeholder="US-XX1-26-00001" 
+                className="input-field w-full font-mono text-xs"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="text-xs font-bold text-outline uppercase mb-1 block">Tempo (BPM)</label>
+              <input 
+                type="number" 
+                value={bpm} 
+                onChange={(e) => setBpm(e.target.value)}
+                placeholder="e.g. 124" 
+                className="input-field w-full"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="text-xs font-bold text-outline uppercase mb-1 block">Key Signature</label>
+              <input 
+                type="text" 
+                value={keySignature} 
+                onChange={(e) => setKeySignature(e.target.value)}
+                placeholder="e.g. C Major" 
+                className="input-field w-full"
+              />
+            </div>
+          </div>
+
+          {/* Copyright Notice */}
+          <div className="form-group">
+            <label className="text-xs font-bold text-outline uppercase mb-1 block">Copyright & Phonographic Line (℗ & ©)</label>
+            <input 
+              type="text" 
+              value={copyrightNotice} 
+              onChange={(e) => setCopyrightNotice(e.target.value)}
+              placeholder="℗ 2026 Trinity Sound. All Rights Reserved." 
               className="input-field w-full"
             />
           </div>

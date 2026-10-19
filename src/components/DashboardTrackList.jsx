@@ -28,7 +28,11 @@ const DashboardTrackList = ({ tracks, onPlay, onEdit, onDelete, onShare }) => {
           return (
             <div key={track.id} className={`track-list-row ${isCurrent ? 'current-active' : ''}`}>
               {/* Cover & Title */}
-              <div className="col-info flex items-center gap-3">
+              <div 
+                className="col-info flex items-center gap-3 cursor-pointer"
+                onClick={() => onPlay(track)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="track-cover-container">
                   <img 
                     src={track.artworkUrl || "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&q=80&w=100"} 
@@ -38,7 +42,10 @@ const DashboardTrackList = ({ tracks, onPlay, onEdit, onDelete, onShare }) => {
                   <button 
                     type="button" 
                     className="track-play-hover-btn"
-                    onClick={() => onPlay(track)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onPlay(track);
+                    }}
                   >
                     <span className="material-symbols-outlined">
                       {isCurrent && isPlaying ? 'pause_circle' : 'play_circle'}
@@ -46,7 +53,7 @@ const DashboardTrackList = ({ tracks, onPlay, onEdit, onDelete, onShare }) => {
                   </button>
                 </div>
                 <div className="track-title-details truncate">
-                  <h4 className="m-0 text-sm truncate">{track.title}</h4>
+                  <h4 className="m-0 text-sm truncate font-bold hover:text-primary">{track.title}</h4>
                   <p className="text-xs text-outline m-0 italic truncate">trinitysound.com/tracks/{track.permalink || track.id}</p>
                 </div>
               </div>

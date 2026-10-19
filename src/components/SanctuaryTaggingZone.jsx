@@ -2,10 +2,12 @@ import React, { useState, useRef } from 'react';
 import { storage, db, auth } from '../firebase';
 import { ref, uploadBytes } from 'firebase/storage';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { useToast } from '../context/ToastContext';
 
 const PILLARS = ['Glowstep', 'Antha', 'Heirwave', 'ZionSoul', 'Rhema&B', 'ZionDrill', 'Upperground'];
 
 const SanctuaryTaggingZone = () => {
+  const { showToast } = useToast();
   const [file, setFile] = useState(null);
   const [title, setTitle] = useState('');
   const [selectedPillar, setSelectedPillar] = useState('');
@@ -22,7 +24,7 @@ const SanctuaryTaggingZone = () => {
 
   const handleUpload = async () => {
     if (!file || !title || !selectedPillar || !auth?.currentUser) {
-      if(!auth?.currentUser) alert("You must be logged in to upload tracks.");
+      if(!auth?.currentUser) showToast("You must be logged in to upload tracks.", "warning");
       return;
     }
     
@@ -44,10 +46,10 @@ const SanctuaryTaggingZone = () => {
       setFile(null);
       setTitle('');
       setSelectedPillar('');
-      alert("Track uploaded successfully and sent to the Refinery!");
+      showToast("Track uploaded successfully and sent to the Refinery!", "success");
     } catch (err) {
       console.error(err);
-      alert("Upload failed.");
+      showToast("Upload failed.", "error");
     } finally {
       setUploading(false);
     }

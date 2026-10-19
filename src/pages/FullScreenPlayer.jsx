@@ -118,8 +118,13 @@ const FullScreenPlayer = ({ setCurrentView }) => {
           </div>
           
           <h1 className="font-headline" style={{ fontSize: '44px', marginBottom: '6px' }}>{track.title}</h1>
-          <p className="text-primary italic m-0" style={{ fontFamily: "'Playfair Display', serif", fontSize: '26px' }}>
-            {track.artist || track.artistName || 'Brandon Robinson'}
+          <p className="text-primary italic m-0 flex items-center justify-center gap-2 flex-wrap" style={{ fontFamily: "'Playfair Display', serif", fontSize: '26px' }}>
+            <span>{track.artist || track.artistName || 'Brandon Robinson'}</span>
+            {Array.isArray(track.collaborators) && track.collaborators.length > 0 && (
+              <span className="text-outline font-normal text-lg" style={{ fontStyle: 'normal' }}>
+                {' ft. ' + track.collaborators.map(c => c.displayName).join(', ')}
+              </span>
+            )}
           </p>
 
           <div className="mt-xl mb-xl">

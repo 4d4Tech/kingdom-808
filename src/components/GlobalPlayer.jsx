@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAudio } from '../context/AudioProvider';
+import TrackDetailsModal from './TrackDetailsModal';
 
 const GlobalPlayer = () => {
   const {
@@ -16,6 +17,7 @@ const GlobalPlayer = () => {
   } = useAudio();
 
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
   const [isRepeatOne, setIsRepeatOne] = useState(false);
@@ -129,10 +131,25 @@ const GlobalPlayer = () => {
                   toggleTrackLike(currentTrack?.id);
                 }}
                 disabled={!currentTrack}
+                title="Like Track"
               >
                 <span className="material-symbols-outlined">
                   {currentTrack && likedTracks[currentTrack.id] ? 'favorite' : 'favorite_border'}
                 </span>
+              </button>
+
+              {/* Dedicated Track Details Info Button */}
+              <button 
+                type="button"
+                className="icon-btn text-primary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowDetailsModal(true);
+                }}
+                disabled={!currentTrack}
+                title="View Track Details & Lyrics"
+              >
+                <span className="material-symbols-outlined">info</span>
               </button>
             </div>
 
@@ -191,7 +208,18 @@ const GlobalPlayer = () => {
           <div className="player-slide slide-extra">
             <div className="player-right flex items-center justify-end gap-4">
               <div className="player-extra-buttons flex items-center gap-4">
-                <button className="icon-btn muted"><span className="material-symbols-outlined">lyrics</span></button>
+                <button 
+                  type="button" 
+                  className="icon-btn text-primary" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDetailsModal(true);
+                  }}
+                  title="View Track Details & Lyrics"
+                >
+                  <span className="material-symbols-outlined">info</span>
+                </button>
+                <button className="icon-btn muted" onClick={() => setShowDetailsModal(true)}><span className="material-symbols-outlined">lyrics</span></button>
                 <button className="icon-btn muted"><span className="material-symbols-outlined">queue_music</span></button>
               </div>
               <div className="flex items-center gap-2 volume-control">
@@ -312,6 +340,13 @@ const GlobalPlayer = () => {
           <span className="material-symbols-outlined up-next-arrow">keyboard_arrow_up</span>
         </div>
       </div>
+
+      {/* Track Details Information Modal */}
+      <TrackDetailsModal 
+        track={currentTrack}
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+      />
     </div>
   );
 };

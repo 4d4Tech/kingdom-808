@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
+import { useToast } from '../context/ToastContext';
 
 const UploadDropzone = ({ onFileSelect }) => {
+  const { showToast } = useToast();
   const [isDragActive, setIsDragActive] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -23,7 +25,7 @@ const UploadDropzone = ({ onFileSelect }) => {
     if (isValid) {
       onFileSelect(file);
     } else {
-      alert("Invalid audio format. Please upload .mp3, .wav, .flac, or .m4a.");
+      showToast("Invalid audio format. Please upload .mp3, .wav, .flac, or .m4a.", "warning");
     }
   };
 

@@ -64,7 +64,7 @@ const Discover = () => {
       artist: track.artist || track.artistName || 'Brandon Robinson',
       album: track.genre || 'Single',
       img: track.artworkUrl || track.img || "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=400",
-      audioUrl: track.audioUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+      audioUrl: track.audioUrl || "https://codeskulptor-demos.commondatastorage.googleapis.com/desolate_shores/desolate_shores.mp3"
     });
   };
 
@@ -205,7 +205,14 @@ const Discover = () => {
                   <div style={{ position: 'relative', zIndex: 2 }}>
                     <h4 className="m-0 text-base font-bold truncate">{track.title}</h4>
                     <p className="text-xs text-outline m-0 mt-1 flex items-center justify-between">
-                      <span className="font-semibold text-primary">{track.artist || track.artistName || 'Brandon Robinson'}</span>
+                      <span className="font-semibold text-primary truncate" style={{ maxWidth: '75%' }}>
+                        {track.artist || track.artistName || 'Brandon Robinson'}
+                        {Array.isArray(track.collaborators) && track.collaborators.length > 0 && (
+                          <span className="text-outline font-normal">
+                            {' ft. ' + track.collaborators.map(c => c.displayName).join(', ')}
+                          </span>
+                        )}
+                      </span>
                       <span className="badge outline text-xs" style={{ fontSize: '10px', padding: '2px 8px' }}>{track.genre || 'Worship'}</span>
                     </p>
                     {track.credits && (
