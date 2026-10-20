@@ -164,7 +164,6 @@ const GlobalPlayer = () => {
                 <button className="icon-btn"><span className="material-symbols-outlined">skip_previous</span></button>
                 <button 
                   className="play-fab small" 
-                  style={{backgroundColor: 'var(--color-primary)', color: 'white'}}
                   onClick={togglePlay}
                   disabled={!currentTrack}
                 >

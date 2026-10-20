@@ -35,6 +35,7 @@ function App() {
   const [authModalPrompt, setAuthModalPrompt] = useState('');
   const [isProfileSettingsOpen, setIsProfileSettingsOpen] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [selectedArtist, setSelectedArtist] = useState(null);
 
   const handleSignOut = () => {
     localStorage.removeItem('local_user_profile');
@@ -135,8 +136,21 @@ function App() {
       setAuthModalPrompt("Sign in as an Artist to access Creator Studio & manage your music catalog");
       setIsAuthModalOpen(true);
     } else {
+      if (view === 'artist') {
+        setSelectedArtist(null);
+      }
       setCurrentView(view);
     }
+  };
+
+  const handleOpenArtistProfile = (artistInfo) => {
+    if (!artistInfo) return;
+    const normalized = typeof artistInfo === 'string'
+      ? { name: artistInfo.split(',')[0].replace(/\s+ft\..*$/i, '').trim() }
+      : artistInfo;
+    setSelectedArtist(normalized);
+    setCurrentView('artist');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleRequireListenerAuth = (msg) => {
@@ -146,13 +160,20 @@ function App() {
 
   const renderView = () => {
     switch (currentView) {
-      case 'discover': return <Discover />;
+      case 'discover': return <Discover onSelectArtist={handleOpenArtistProfile} />;
       case 'playlist': return <PlaylistDetail user={user} onRequireAuth={handleRequireListenerAuth} />;
       case 'wrapped': return <Wrapped />;
       case 'player': return <FullScreenPlayer setCurrentView={handleNavigate} />;
-      case 'artist': return <ArtistProfile userProfile={userProfile} onOpenSettings={() => setIsProfileSettingsOpen(true)} />;
+      case 'artist': return (
+        <ArtistProfile
+          userProfile={userProfile}
+          selectedArtist={selectedArtist}
+          onBack={() => setCurrentView('discover')}
+          onOpenSettings={() => setIsProfileSettingsOpen(true)}
+        />
+      );
       case 'dashboard': return <Dashboard userProfile={userProfile} />;
-      default: return <Discover />;
+      default: return <Discover onSelectArtist={handleOpenArtistProfile} />;
     }
   };
 

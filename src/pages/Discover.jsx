@@ -253,7 +253,7 @@ const ALL_GENRES = [
   { name: 'Ambient', desc: 'Peaceful instrumental soundscapes.', img: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?auto=format&fit=crop&q=80&w=600' }
 ];
 
-const Discover = () => {
+const Discover = ({ onSelectArtist }) => {
   const [uploadedTracks, setUploadedTracks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedGenreFilter, setSelectedGenreFilter] = useState('All');
@@ -264,6 +264,47 @@ const Discover = () => {
     albums: false
   });
   const { playTrack, togglePlay, currentTrack, isPlaying, setQueue } = useAudio();
+
+  const handleArtistClick = (e, artistTarget) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    if (!artistTarget || !onSelectArtist) return;
+
+    if (typeof artistTarget === 'string') {
+      const cleanName = artistTarget.trim();
+      const matched = POPULAR_ARTISTS_LIST.find(
+        a => a.name.toLowerCase() === cleanName.toLowerCase()
+      );
+      onSelectArtist(matched || { name: cleanName });
+    } else {
+      onSelectArtist(artistTarget);
+    }
+  };
+
+  const renderArtistLinks = (artistString) => {
+    const raw = artistString || 'Brandon Robinson';
+    const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+    return parts.map((name, idx) => (
+      <React.Fragment key={`${name}-${idx}`}>
+        <span
+          className="artist-name-link"
+          onClick={(e) => handleArtistClick(e, name)}
+          role="link"
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleArtistClick(e, name);
+            }
+          }}
+        >
+          {name}
+        </span>
+        {idx < parts.length - 1 ? ', ' : ''}
+      </React.Fragment>
+    ));
+  };
 
   const toggleSectionExpand = (sectionKey) => {
     setExpandedSections(prev => ({
@@ -421,8 +462,19 @@ const Discover = () => {
         {(uploadedTracks.length > 0 || selectedGenreFilter !== 'All' || selectedArtistFilter) && (
           <div className="flex gap-2 items-center flex-wrap">
             {uploadedTracks.length > 0 && (
-              <span className="badge" style={{ backgroundColor: 'rgba(0, 93, 144, 0.1)', color: 'var(--color-primary)', padding: '8px 18px', borderRadius: '99px', fontSize: '13px', fontWeight: 'bold' }}>
-                🎵 {uploadedTracks.length} Artist Tracks Online
+              <span
+                className="badge"
+                style={{
+                  backgroundColor: 'var(--color-surface-container)',
+                  color: 'var(--color-on-surface-variant)',
+                  border: '1px solid var(--color-outline-variant)',
+                  padding: '6px 14px',
+                  borderRadius: '99px',
+                  fontSize: '12px',
+                  fontWeight: '500'
+                }}
+              >
+                {uploadedTracks.length} Artist {uploadedTracks.length === 1 ? 'Track' : 'Tracks'} Online
               </span>
             )}
             {selectedGenreFilter !== 'All' && (
@@ -512,7 +564,7 @@ const Discover = () => {
                         {song.badge && (
                           <span className="spotify-explicit-badge">{song.badge}</span>
                         )}
-                        <span>{song.artist}</span>
+                        <span>{renderArtistLinks(song.artist)}</span>
                       </p>
                     </div>
                   </div>
@@ -540,30 +592,17 @@ const Discover = () => {
           <div className={`spotify-shelf-wrapper ${expandedSections.artists ? 'is-expanded' : ''}`}>
             <div className={expandedSections.artists ? 'spotify-shelf-grid' : 'spotify-shelf-row'}>
               {popularArtists.map((artist) => {
-                const track = artist.featuredTrack;
-                const isThisArtistPlaying = currentTrack && (
-                  currentTrack.id === track?.id ||
-                  currentTrack.title === track?.title ||
-                  (currentTrack.artist && currentTrack.artist.toLowerCase().includes(artist.name.toLowerCase()))
-                );
-                const isActivePlaying = isThisArtistPlaying && isPlaying;
-                const isArtistFiltered = selectedArtistFilter === artist.name;
-
                 return (
                   <div
                     key={artist.id}
-                    className={`spotify-media-card artist-variant ${isThisArtistPlaying || isArtistFiltered ? 'is-active' : ''}`}
-                    onClick={() => {
-                      setSelectedArtistFilter(prev => prev === artist.name ? null : artist.name);
-                      handlePlayChartTrack(track, trendingSongs);
-                    }}
+                    className="spotify-media-card artist-variant"
+                    onClick={(e) => handleArtistClick(e, artist)}
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        setSelectedArtistFilter(prev => prev === artist.name ? null : artist.name);
-                        handlePlayChartTrack(track, trendingSongs);
+                        handleArtistClick(e, artist);
                       }
                     }}
                   >
@@ -574,22 +613,15 @@ const Discover = () => {
                         className="spotify-card-artwork circle"
                         loading="lazy"
                       />
-                      <button
-                        type="button"
-                        className={`spotify-card-play-btn ${isActivePlaying ? 'playing' : ''}`}
-                        aria-label={isActivePlaying ? `Pause ${artist.name}` : `Play ${artist.name}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePlayChartTrack(track, trendingSongs);
-                        }}
-                      >
-                        <span className="material-symbols-outlined fill-icon">
-                          {isActivePlaying ? 'pause' : 'play_arrow'}
-                        </span>
-                      </button>
                     </div>
                     <div className="spotify-card-meta">
-                      <h4 className="spotify-card-title" title={artist.name}>{artist.name}</h4>
+                      <h4
+                        className="spotify-card-title artist-name-link"
+                        title={artist.name}
+                        onClick={(e) => handleArtistClick(e, artist)}
+                      >
+                        {artist.name}
+                      </h4>
                       <p className="spotify-card-subtitle">{artist.role || 'Artist'}</p>
                     </div>
                   </div>
@@ -658,7 +690,7 @@ const Discover = () => {
                     <div className="spotify-card-meta">
                       <h4 className="spotify-card-title" title={album.title}>{album.title}</h4>
                       <p className="spotify-card-subtitle" title={`${album.artist} • ${album.type}`}>
-                        {album.year} • {album.artist}
+                        {album.year} • {renderArtistLinks(album.artist)}
                       </p>
                     </div>
                   </div>
@@ -740,7 +772,7 @@ const Discover = () => {
                     />
                     <button 
                       type="button" 
-                      className="play-fab"
+                      className="play-fab small"
                       onClick={(e) => {
                         e.stopPropagation();
                         handlePlayChartTrack(track);
@@ -748,21 +780,10 @@ const Discover = () => {
                       style={{
                         position: 'absolute',
                         bottom: '12px',
-                        right: '12px',
-                        width: '48px',
-                        height: '48px',
-                        backgroundColor: 'var(--color-primary)',
-                        color: 'white',
-                        borderRadius: '50%',
-                        border: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
-                        cursor: 'pointer'
+                        right: '12px'
                       }}
                     >
-                      <span className="material-symbols-outlined fill-icon" style={{ fontSize: '28px' }}>
+                      <span className="material-symbols-outlined fill-icon" style={{ fontSize: '22px' }}>
                         {isCurrent && isPlaying ? 'pause' : 'play_arrow'}
                       </span>
                     </button>
@@ -772,14 +793,30 @@ const Discover = () => {
                     <h4 className="m-0 text-base font-bold truncate">{track.title}</h4>
                     <p className="text-xs text-outline m-0 mt-1 flex items-center justify-between">
                       <span className="font-semibold text-primary truncate" style={{ maxWidth: '75%' }}>
-                        {track.artist || track.artistName || 'Brandon Robinson'}
+                        <span
+                          className="artist-name-link"
+                          onClick={(e) => handleArtistClick(e, track.artist || track.artistName || 'Brandon Robinson')}
+                        >
+                          {track.artist || track.artistName || 'Brandon Robinson'}
+                        </span>
                         {Array.isArray(track.collaborators) && track.collaborators.length > 0 && (
                           <span className="text-outline font-normal">
-                            {' ft. ' + track.collaborators.map(c => c.displayName).join(', ')}
+                            {' ft. '}
+                            {track.collaborators.map((c, cIdx) => (
+                              <React.Fragment key={c.displayName || cIdx}>
+                                <span
+                                  className="artist-name-link"
+                                  onClick={(e) => handleArtistClick(e, c.displayName)}
+                                >
+                                  {c.displayName}
+                                </span>
+                                {cIdx < track.collaborators.length - 1 ? ', ' : ''}
+                              </React.Fragment>
+                            ))}
                           </span>
                         )}
                       </span>
-                      <span className="badge outline text-xs" style={{ fontSize: '10px', padding: '2px 8px' }}>{track.genre || 'Worship'}</span>
+                      <span className="badge outline text-xs" style={{ fontSize: '10px', padding: '2px 8px', fontWeight: '500', color: 'var(--color-outline)' }}>{track.genre || 'Worship'}</span>
                     </p>
                     {track.credits && (
                       <p className="text-xs text-outline italic m-0 mt-1 truncate">
@@ -805,13 +842,30 @@ const Discover = () => {
             />
             <div className="celestial-overlay" style={{ padding: '44px' }}>
               <div>
-                <span className="badge" style={{ backgroundColor: 'var(--color-primary)', color: 'white', padding: '6px 16px', fontSize: '11px', fontWeight: 'bold', letterSpacing: '1px', borderRadius: '99px' }}>
+                <span
+                  className="badge"
+                  style={{
+                    backgroundColor: 'rgba(20, 22, 25, 0.72)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    color: '#d8e8f6',
+                    padding: '6px 14px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    letterSpacing: '0.08em',
+                    borderRadius: '99px'
+                  }}
+                >
                   FEATURED RELEASE #1
                 </span>
                 <h1 className="font-headline text-white mt-4 truncate" style={{ fontSize: '48px', marginBottom: '8px', fontStyle: 'italic' }}>
                   {heroTrack ? heroTrack.title : "Heaven on Earth"}
                 </h1>
-                <p className="text-white m-0" style={{ fontFamily: "'Geist', sans-serif", fontSize: '22px', fontWeight: 'bold', opacity: 0.9 }}>
+                <p
+                  className="text-white m-0 artist-name-link inline-block"
+                  style={{ fontFamily: "'Geist', sans-serif", fontSize: '20px', fontWeight: '500', opacity: 0.85 }}
+                  onClick={(e) => handleArtistClick(e, heroTrack ? (heroTrack.artist || "Brandon Robinson") : "Divinity Collective")}
+                >
                   {heroTrack ? (heroTrack.artist || "Brandon Robinson") : "Divinity Collective"}
                 </p>
               </div>
@@ -819,9 +873,9 @@ const Discover = () => {
                 type="button"
                 className="play-fab" 
                 onClick={() => handlePlayChartTrack(heroTrack || { title: 'Heaven on Earth', artist: 'Divinity Collective', img: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&q=80&w=400' })}
-                style={{ position: 'absolute', bottom: '40px', right: '40px', width: '64px', height: '64px', backgroundColor: 'white', borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 24px rgba(0,0,0,0.25)' }}
+                style={{ position: 'absolute', bottom: '40px', right: '40px' }}
               >
-                <span className="material-symbols-outlined fill-icon text-primary" style={{ fontSize: '36px' }}>
+                <span className="material-symbols-outlined fill-icon" style={{ fontSize: '30px' }}>
                   {currentTrack?.title === (heroTrack ? heroTrack.title : 'Heaven on Earth') && isPlaying ? 'pause' : 'play_arrow'}
                 </span>
               </button>
@@ -830,7 +884,7 @@ const Discover = () => {
         </div>
 
         <div className="right-col">
-          <p className="text-xs text-primary font-bold uppercase tracking-wider mb-4">Fastest Climbers</p>
+          <p className="text-xs text-outline font-bold uppercase tracking-wider mb-4">Fastest Climbers</p>
           <div className="flex-col gap-4">
             {(uploadedTracks.length > 1 ? uploadedTracks.slice(0, 3) : [
               { id: 'sacred-morning', rank: '02', title: 'Sacred Morning', artist: 'Zion Worship', img: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=100' },
@@ -842,16 +896,21 @@ const Discover = () => {
                 className="fastest-climbers-card cursor-pointer"
                 onClick={() => handlePlayChartTrack(item)}
               >
-                <span className="font-headline text-surface-container-highest" style={{ fontSize: '32px', fontStyle: 'italic' }}>
+                <span className="font-headline" style={{ fontSize: '28px', fontStyle: 'italic', color: 'var(--color-outline)' }}>
                   {String(idx + 2).padStart(2, '0')}
                 </span>
-                <img src={item.artworkUrl || item.img || "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=100"} alt={item.title} style={{ width: '56px', height: '56px', borderRadius: '12px', objectFit: 'cover' }} />
+                <img src={item.artworkUrl || item.img || "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?auto=format&fit=crop&q=80&w=100"} alt={item.title} style={{ width: '52px', height: '52px', borderRadius: '10px', objectFit: 'cover' }} />
                 <div className="flex-1">
                   <h4 className="m-0 text-sm">{item.title}</h4>
-                  <p className="m-0 text-xs text-outline">{item.artist || 'Brandon Robinson'}</p>
+                  <p
+                    className="m-0 text-xs text-outline artist-name-link inline-block"
+                    onClick={(e) => handleArtistClick(e, item.artist || 'Brandon Robinson')}
+                  >
+                    {item.artist || 'Brandon Robinson'}
+                  </p>
                 </div>
-                <button type="button" className="icon-btn-circle outline small">
-                  <span className="material-symbols-outlined text-sm">
+                <button type="button" className="icon-btn-circle outline" style={{ width: '38px', height: '38px' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
                     {currentTrack?.title === item.title && isPlaying ? 'pause' : 'play_arrow'}
                   </span>
                 </button>
@@ -865,7 +924,7 @@ const Discover = () => {
       <div className="mb-xl">
         <div className="flex justify-between items-baseline mb-4">
           <h2>Explore Trinity Genres</h2>
-          <span className="text-primary text-xs font-bold uppercase tracking-wider">{ALL_GENRES.length} Genres Active</span>
+          <span className="text-outline text-xs font-bold uppercase tracking-wider">{ALL_GENRES.length} Genres Active</span>
         </div>
 
         <div className="genre-cards">
@@ -878,10 +937,13 @@ const Discover = () => {
             return (
               <div 
                 key={g.name} 
-                className={`genre-card ${isSelected ? 'active-genre-card' : ''}`}
+                className={`genre-card cursor-pointer ${isSelected ? 'active-genre-card' : ''}`}
+                onClick={() => setSelectedGenreFilter(isSelected ? 'All' : g.name)}
                 style={{
                   position: 'relative',
-                  border: isSelected ? '3px solid var(--color-primary)' : (hasUploads ? '2px solid rgba(0,93,144,0.4)' : 'none')
+                  border: isSelected
+                    ? '1px solid rgba(99, 155, 207, 0.5)'
+                    : '1px solid rgba(255, 255, 255, 0.06)'
                 }}
               >
                 {/* Upper Right Corner Song Count Badge */}
@@ -893,20 +955,20 @@ const Discover = () => {
                       top: '16px',
                       right: '16px',
                       zIndex: 3,
-                      backgroundColor: 'var(--color-primary)', 
-                      color: 'white', 
-                      padding: '6px 14px', 
+                      backgroundColor: 'rgba(20, 22, 25, 0.75)',
+                      backdropFilter: 'blur(8px)',
+                      border: '1px solid rgba(255, 255, 255, 0.14)',
+                      color: '#d8e8f6', 
+                      padding: '5px 12px', 
                       borderRadius: '9999px',
                       fontSize: '11px',
-                      fontWeight: 'bold',
-                      letterSpacing: '0.05em',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                      fontWeight: '600',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '5px'
                     }}
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>music_note</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>music_note</span>
                     {songCount} {songCount === 1 ? 'Song' : 'Songs'}
                   </span>
                 )}
@@ -915,13 +977,13 @@ const Discover = () => {
                 <div className="overlay"></div>
                 <div className="content">
                   
-                  <h3 className="m-0 mb-1" style={{ fontSize: '28px' }}>{g.name}</h3>
-                  <p className="text-sm mb-4" style={{ maxWidth: '90%', lineHeight: '1.4', opacity: 0.9 }}>
+                  <h3 className="m-0 mb-1" style={{ fontSize: '26px' }}>{g.name}</h3>
+                  <p className="text-sm mb-4" style={{ maxWidth: '90%', lineHeight: '1.4', opacity: 0.82 }}>
                     {g.desc}
                   </p>
 
                   {hasUploads && matchingTracks[0] && (
-                    <p className="text-xs italic text-primary-fixed-dim m-0 mb-3 truncate" style={{ color: 'rgba(255,255,255,0.95)' }}>
+                    <p className="text-xs italic m-0 mb-3 truncate" style={{ color: 'rgba(228, 231, 236, 0.8)' }}>
                       Includes "{matchingTracks[0].title}" by {matchingTracks[0].artist || 'Brandon Robinson'}
                     </p>
                   )}
@@ -929,35 +991,28 @@ const Discover = () => {
                   <div className="flex gap-2">
                     <button 
                       type="button" 
-                      className={`btn btn-pill ${hasUploads ? 'btn-primary' : 'outline text-white'}`}
-                      onClick={() => {
+                      className="btn btn-pill with-icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
                         if (hasUploads) {
                           handlePlayChartTrack(matchingTracks[0]);
                         } else {
-                          setSelectedGenreFilter(g.name);
+                          setSelectedGenreFilter(isSelected ? 'All' : g.name);
                         }
                       }}
                       style={{ 
-                        borderColor: 'rgba(255,255,255,0.5)', 
-                        backdropFilter: 'blur(4px)',
-                        padding: '8px 20px',
+                        backgroundColor: isSelected ? 'rgba(99, 155, 207, 0.25)' : 'rgba(20, 22, 25, 0.65)',
+                        borderColor: isSelected ? 'rgba(99, 155, 207, 0.45)' : 'rgba(255, 255, 255, 0.14)', 
+                        color: '#e4e7ec',
+                        backdropFilter: 'blur(8px)',
+                        padding: '7px 16px',
                         fontSize: '12px'
                       }}
                     >
-                      {hasUploads ? `Play ${g.name}` : `Explore ${g.name}`}
-                    </button>
-                    <button 
-                      type="button"
-                      className="btn btn-pill outline text-white"
-                      onClick={() => setSelectedGenreFilter(g.name)}
-                      style={{ 
-                        borderColor: 'rgba(255,255,255,0.4)', 
-                        backdropFilter: 'blur(4px)',
-                        padding: '8px 16px',
-                        fontSize: '12px'
-                      }}
-                    >
-                      Filter
+                      <span className="material-symbols-outlined fill-icon" style={{ fontSize: '15px' }}>
+                        {hasUploads ? 'play_arrow' : 'tune'}
+                      </span>
+                      {hasUploads ? `Play ${g.name}` : (isSelected ? 'Filtered' : `Explore ${g.name}`)}
                     </button>
                   </div>
 

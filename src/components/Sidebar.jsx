@@ -22,33 +22,10 @@ const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen, onOpenSettings
         </div>
       </div>
 
-      {/* Prominent Listener Sign In / Sign Up Button for Guests */}
-      {isGuest && (
-        <div className="px-3 mb-4">
-          <button 
-            type="button" 
-            className="btn btn-pill btn-primary btn-xs w-full text-center flex items-center justify-center gap-2"
-            onClick={onOpenListenerAuth || onOpenArtistAuth}
-            style={{ padding: '10px 16px', fontWeight: 'bold', fontSize: '12px' }}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>account_circle</span>
-            Sign In / Sign Up
-          </button>
-        </div>
-      )}
-      
       {/* Primary Navigation (Apple Music / Spotify Parity) */}
       <nav className="sidebar-nav">
         <div className="px-4 mb-1 text-xs font-bold text-outline uppercase tracking-wider flex justify-between items-center">
           <span>Listen</span>
-          {isGuest && (
-            <span 
-              className="text-primary text-xs font-bold cursor-pointer underline hover:opacity-80"
-              onClick={onOpenListenerAuth || onOpenArtistAuth}
-            >
-              Sign In
-            </span>
-          )}
         </div>
 
         <button 
@@ -148,8 +125,7 @@ const Sidebar = ({ currentView, setCurrentView, isMobileMenuOpen, onOpenSettings
       {/* Footer Settings */}
       <div className="sidebar-footer mt-auto pt-4">
         <button 
-          className="btn w-full mb-3 text-xs py-2 font-bold" 
-          style={{ backgroundColor: 'var(--color-secondary-container)', color: 'var(--color-on-secondary-container)' }}
+          className="btn outline w-full mb-2 text-xs py-2" 
         >
           Upgrade to Premium
         </button>
